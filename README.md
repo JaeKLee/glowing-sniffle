@@ -2,8 +2,7 @@
 This is CMPT432 Compilers (Yes, you're at the right spot)
 
 How to open/run the compilers:
-  1. Download the files
-  2. Locate to the file
+  1. Download the files in `src`
   3. Breathe in, breathe out
   4. Open the index.html 
   
