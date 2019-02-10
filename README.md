@@ -2,8 +2,8 @@
 This is CMPT432 Compilers (Yes, you're at the right spot)
 
 How to open/run the compilers:
-  1. Download the files in `src`
-  3. Breathe in, breathe out
-  4. Open the index.html 
-  
-  ![alt text](https://github.com/JaeKLee/glowing-sniffle/blob/master/tim-and-eric-mind-blown.gif)
+  - [ ] Open command prompt
+  - [ ] Open the file through command prompt:
+    - [ ] e.g. "C:\Users\John.Smith\Documents\Marist\Spring 2019\glowing-sniffle"
+  - [ ] Run filename.py
+
