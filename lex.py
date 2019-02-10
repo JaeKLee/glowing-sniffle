@@ -23,7 +23,7 @@ for line in listFile:
   # for character in line: 
     # print(character)
   if re.search(regex.leftParen, line):
-    print("In line " , lineNumber, "found token left paren:    " , line)
+    print("Found token left paren:    " , line , " in line " , lineNumber)
   elif re.search(regex.rightParen, line):
     print("Found token right paren:   " , line , " in line " , lineNumber)
   elif re.search(regex.character, line):
