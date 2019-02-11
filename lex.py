@@ -90,8 +90,8 @@ while indexCounter < len(listFile):
         indexCounter+=1
     print("Found token END QUOTE : " , listFile[indexCounter], " in line ", lineNumber)
   elif re.search(r"!", listFile[indexCounter]):
-    if re.search(r"=", listFile[indexCounter+1]):
-      print("Found token NOT EQUAL : != " , listFile[indexCounter+1] , " in line ", lineNumber)
+    if re.search(r"=", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile):
+      print("Found token NOT EQUAL : != in line ", lineNumber)
     else: 
       errorCounter+=1
       break
@@ -104,7 +104,9 @@ while indexCounter < len(listFile):
   elif re.search(r"[0-9]", listFile[indexCounter]):
     print("Found token DIGIT : " , listFile[indexCounter] , " in line " , lineNumber)
   elif re.search(r"\+", listFile[indexCounter]):
-    print("")
+    print("Found token INTOP : " , listFile[indexCounter] , " in lin " , lineNumber)
+  # elif re.search(r"/", listFile[indexCounter]):
+  #   if indexCounter < len(listFile) and re.search(r"=", listFile[indexCounter]):
   elif re.match(r"\n", listFile[indexCounter]):
     lineNumber+=1
   elif re.compile(regex.eop).search(listFile[indexCounter]):

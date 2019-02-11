@@ -10,6 +10,6 @@
   string b
   a = b 
   != ==
-  "there is no spoon"
+  "there is no spoon" ++++
   12549847
 }$
