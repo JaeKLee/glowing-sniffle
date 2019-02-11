@@ -1,6 +1,8 @@
 {
+  if int
   int a
-  a = a
+  a = aaa
   string b
   a = b 
+  !=
 }$
