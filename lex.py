@@ -30,8 +30,9 @@ while indexCounter < len(listFile):
     print("Found token RIGHT BRACE:   " , listFile[indexCounter] , " in line ", lineNumber)
 # First it detects for any letters and depending on what it finds, it will loop until there are no more letters
   elif re.search(regex.character, listFile[indexCounter]):
-    if re.search(r"i", listFile[indexCounter]):
-      if indexCounter+1 < len(listFile): # To avoid index out of range
+    if re.search(r"i", listFile[indexCounter]): # IF or INT
+      # To avoid index out of range
+      if indexCounter+1 < len(listFile) and (re.search(r"f", listFile[indexCounter+1]) or re.search(r"n", listFile[indexCounter+1])) : 
         indexCounter+=1 
         if re.search(r"f", listFile[indexCounter]):
           print("Found token IF : if in line " , lineNumber)
@@ -41,54 +42,73 @@ while indexCounter < len(listFile):
             indexCounter+=1
             if re.search(r"t", listFile[indexCounter]):
               print("Found token INT : int in line " , lineNumber)
-              indexCounter+=1              
-              continue
-    elif re.search(r"w", listFile[indexCounter]):
-      if indexCounter+4 < len(listFile):
+              indexCounter+=1  
+              continue    # So it continues to the next index        
+      else: 
+        print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
         indexCounter+=1
-        if re.search(r"h", listFile[indexCounter]) and re.search(r"i", listFile[indexCounter+1]) and re.search(r"l", listFile[indexCounter+2]) and re.search(r"e", listFile[indexCounter+3]):
-          print("Found token WHILE : while in line " ,  lineNumber)
-          indexCounter+=4
-          continue
-    elif re.search(r"p", listFile[indexCounter]):
-      if indexCounter+4 < len(listFile):
+        continue  
+    elif re.search(r"w", listFile[indexCounter]): # WHILE
+      # It starts +4 because it's after "w"
+      if indexCounter+4 < len(listFile) and re.search(r"h", listFile[indexCounter+1]) and re.search(r"i", listFile[indexCounter+2]) and re.search(r"l", listFile[indexCounter+3]) and re.search(r"e", listFile[indexCounter+4]):
+        print("Found token WHILE : while in line " ,  lineNumber)
+        indexCounter+=5 # Since indexCounter did not increment, it has to increment by the number of letters
+        continue
+      elif indexCounter < len(listFile): 
+        print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
         indexCounter+=1
-        if re.search(r"r", listFile[indexCounter]) and re.search(r"i", listFile[indexCounter+1]) and re.search(r"n", listFile[indexCounter+2]) and re.search(r"t", listFile[indexCounter+3]):
-          print("Found token PRINT : print in line " ,  lineNumber)
-          indexCounter+=4
-          continue
-    elif re.search(r"b", listFile[indexCounter]):
+        continue
+    elif re.search(r"p", listFile[indexCounter]): # PRINT
+      if indexCounter+4 < len(listFile) and re.search(r"r", listFile[indexCounter+1]) and re.search(r"i", listFile[indexCounter+2]) and re.search(r"n", listFile[indexCounter+3]) and re.search(r"t", listFile[indexCounter+4]):
+        print("Found token PRINT : print in line " ,  lineNumber)
+        indexCounter+=5
+        continue
+      elif indexCounter < len(listFile): 
+        print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
+        indexCounter+=1
+        continue
+    elif re.search(r"b", listFile[indexCounter]): # BOOLEAN
       if indexCounter+6 < len(listFile):
         if re.search(r"o", listFile[indexCounter+1]) and re.search(r"o", listFile[indexCounter+2]) and re.search(r"l", listFile[indexCounter+3]) and re.search(r"e", listFile[indexCounter+4]) and re.search(r"a", listFile[indexCounter+5]) and re.search(r"n", listFile[indexCounter+6]):
           print("Found token BOOLEAN : boolean in line " ,  lineNumber)
           indexCounter+=6
           continue
-        else:
-          print("Found token ID : " , listFile[indexCounter] , " in line ", lineNumber)
-          indexCounter+=1
-    elif re.search(r"s", listFile[indexCounter]):
-      if indexCounter+5 < len(listFile):
+      elif indexCounter < len(listFile): 
+        print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
         indexCounter+=1
-        if re.search(r"t", listFile[indexCounter]) and re.search(r"r", listFile[indexCounter+1]) and re.search(r"i", listFile[indexCounter+2]) and re.search(r"n", listFile[indexCounter+3]) and re.search(r"g", listFile[indexCounter+4]):
-          print("Found token STRING : string in line " ,  lineNumber)
-          indexCounter+=5
-          continue
-    elif re.search(r"f", listFile[indexCounter]):
+        continue
+    elif re.search(r"s", listFile[indexCounter]): # STRING
+      if indexCounter+5 < len(listFile) and re.search(r"t", listFile[indexCounter+1]) and re.search(r"r", listFile[indexCounter+2]) and re.search(r"i", listFile[indexCounter+3]) and re.search(r"n", listFile[indexCounter+4]) and re.search(r"g", listFile[indexCounter+5]):
+        print("Found token STRING : string in line " ,  lineNumber)
+        indexCounter+=6
+        continue
+      elif indexCounter < len(listFile): 
+        print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
+        indexCounter+=1
+        continue
+    elif re.search(r"f", listFile[indexCounter]): # FALSE
       if indexCounter+4 < len(listFile):
-        indexCounter+=1
-        if re.search(r"a", listFile[indexCounter]) and re.search(r"l", listFile[indexCounter+1]) and re.search(r"s", listFile[indexCounter+2]) and re.search(r"e", listFile[indexCounter+3]):
+        if re.search(r"a", listFile[indexCounter+1]) and re.search(r"l", listFile[indexCounter+2]) and re.search(r"s", listFile[indexCounter+3]) and re.search(r"e", listFile[indexCounter+4]):
           print("Found token FALSE : false in line " ,  lineNumber)
           indexCounter+=4
           continue
-    elif re.search(r"t", listFile[indexCounter]):
-      if indexCounter+3 < len(listFile):
+      elif indexCounter < len(listFile): 
+        print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
         indexCounter+=1
-        if re.search(r"r", listFile[indexCounter]) and re.search(r"u", listFile[indexCounter+1]) and re.search(r"e", listFile[indexCounter+2]):
+        continue  
+    elif re.search(r"t", listFile[indexCounter]): # TRUE
+      if indexCounter+3 < len(listFile):
+        if re.search(r"r", listFile[indexCounter+1]) and re.search(r"u", listFile[indexCounter+2]) and re.search(r"e", listFile[indexCounter+3]):
           print("Found token TRUE : true in line " ,  lineNumber)
           indexCounter+=3
           continue
+      elif indexCounter < len(listFile): 
+        print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
+        indexCounter+=1
+        continue
     else: 
-      print("Found toke ID : " , listFile[indexCounter] , " in line " , lineNumber)
+      # All ID that that are found
+      print("Found token ID : " , listFile[indexCounter] , " in line " , lineNumber)
     # End of big word if statement
   elif re.search(regex.quote, listFile[indexCounter]):
     print("Found token START QUOTE : " , listFile[indexCounter] , " in line ", lineNumber)

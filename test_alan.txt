@@ -1,17 +1,8 @@
 {
-  if int
-  while(inta
-  print
-  boolean
-  false
-  true
-  int a
-  a = aaa 
-  stringb
-  a = b 
-  != ==
-  "there is no spoon" ++++
-  12549847
-  /*Thiswilldonothing*/
-  int
-}$
+  if int i
+  s
+  w
+  b
+  p
+  t
+  f
