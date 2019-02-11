@@ -59,10 +59,19 @@ while indexCounter < len(listFile):
           continue
     elif re.search(r"b", listFile[indexCounter]):
       if indexCounter+6 < len(listFile):
-        indexCounter+=1
-        if re.search(r"o", listFile[indexCounter]) and re.search(r"o", listFile[indexCounter+1]) and re.search(r"l", listFile[indexCounter+2]) and re.search(r"e", listFile[indexCounter+3]) and re.search(r"a", listFile[indexCounter+4]) and re.search(r"n", listFile[indexCounter+5]):
+        if re.search(r"o", listFile[indexCounter+1]) and re.search(r"o", listFile[indexCounter+2]) and re.search(r"l", listFile[indexCounter+3]) and re.search(r"e", listFile[indexCounter+4]) and re.search(r"a", listFile[indexCounter+5]) and re.search(r"n", listFile[indexCounter+6]):
           print("Found token BOOLEAN : boolean in line " ,  lineNumber)
           indexCounter+=6
+          continue
+        else:
+          print("Found token ID : " , listFile[indexCounter] , " in line ", lineNumber)
+          indexCounter+=1
+    elif re.search(r"s", listFile[indexCounter]):
+      if indexCounter+5 < len(listFile):
+        indexCounter+=1
+        if re.search(r"t", listFile[indexCounter]) and re.search(r"r", listFile[indexCounter+1]) and re.search(r"i", listFile[indexCounter+2]) and re.search(r"n", listFile[indexCounter+3]) and re.search(r"g", listFile[indexCounter+4]):
+          print("Found token STRING : string in line " ,  lineNumber)
+          indexCounter+=5
           continue
     elif re.search(r"f", listFile[indexCounter]):
       if indexCounter+4 < len(listFile):
@@ -105,22 +114,17 @@ while indexCounter < len(listFile):
     print("Found token DIGIT : " , listFile[indexCounter] , " in line " , lineNumber)
   elif re.search(r"\+", listFile[indexCounter]):
     print("Found token INTOP : " , listFile[indexCounter] , " in line " , lineNumber)
-  elif re.search(r"/", listFile[indexCounter]): # /
+  elif re.search(r"/", listFile[indexCounter]): 
     if re.search(r"\*", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile): 
-      continue
-    else:
-      errorCounter+=1
-      break
-  elif re.search(r"\*", listFile[indexCounter]):
-    if re.search(r"/", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile):
-      continue
-    else:
-      errorCounter+=1
-      break
+      # indexCounter did not actually increment, so adding +2 & +3 to check for the element
+      while re.search(r"[^\*]", listFile[indexCounter+2]) and re.search(r"[^/]", listFile[indexCounter+3]):
+        indexCounter+=1
+      indexCounter+=3 # This actually increments the index, so it can continue
   elif re.match(r"\n", listFile[indexCounter]):
     lineNumber+=1
+    indexCounter+=1
   elif re.compile(regex.eop).search(listFile[indexCounter]):
-    print("End of Program detected:  ", listFile[indexCounter], "\n")  
+    print("End of Program detected:  ", listFile[indexCounter], " in line " , lineNumber , "\n")  
     programNumber+=1 
   indexCounter+=1
   if errorCounter > 0:

@@ -7,7 +7,7 @@
   true
   int a
   a = aaa 
-  string b
+  stringb
   a = b 
   != ==
   "there is no spoon" ++++
