@@ -1,7 +1,12 @@
 {
   if int
+  while
+  print
+  boolean
+  false
+  true
   int a
-  a = aaa
+  a = aaa 
   string b
   a = b 
   !=
