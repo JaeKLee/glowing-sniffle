@@ -1,12 +1,13 @@
 import re 
 
-leftParen = r"{"
-rightParen = r"}"
+leftBrace = r"{"
+rightBrace = r"}"
+leftParen = r"\("
+rightParen = r"\)"
 equal = r"(==)"
 notEqual = r"!="
 assign = r"="
 eop = r"\$"
 character = r"(?:[a-z])"
-startQuote = r"\""
-endQuote = r"\""
+quote = r"\""
 # regex = r"([a-zA-Z]+) (\d+)"

@@ -1,6 +1,6 @@
 {
   if int
-  while
+  while(inta
   print
   boolean
   false
@@ -9,5 +9,7 @@
   a = aaa 
   string b
   a = b 
-  !=
+  != ==
+  "there is no spoon"
+  12549847
 }$
