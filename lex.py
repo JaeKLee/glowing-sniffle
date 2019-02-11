@@ -104,44 +104,24 @@ while indexCounter < len(listFile):
   elif re.search(r"[0-9]", listFile[indexCounter]):
     print("Found token DIGIT : " , listFile[indexCounter] , " in line " , lineNumber)
   elif re.search(r"\+", listFile[indexCounter]):
-    print("Found token INTOP : " , listFile[indexCounter] , " in lin " , lineNumber)
-  # elif re.search(r"/", listFile[indexCounter]):
-  #   if indexCounter < len(listFile) and re.search(r"=", listFile[indexCounter]):
+    print("Found token INTOP : " , listFile[indexCounter] , " in line " , lineNumber)
+  elif re.search(r"/", listFile[indexCounter]): # /
+    if re.search(r"\*", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile): 
+      continue
+    else:
+      errorCounter+=1
+      break
+  elif re.search(r"\*", listFile[indexCounter]):
+    if re.search(r"/", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile):
+      continue
+    else:
+      errorCounter+=1
+      break
   elif re.match(r"\n", listFile[indexCounter]):
     lineNumber+=1
   elif re.compile(regex.eop).search(listFile[indexCounter]):
     print("End of Program detected:  ", listFile[indexCounter], "\n")  
-    programNumber+=1
-  # else:
-    # warningCounter+=1
-    # print("Error detected at " , lineNumber)
-    
-
-    # if re.search(regex.typeInt, indexCounter): # Integer
-    #   print("Found token type Integer:  " , indexCounter , " in indexCounter " , lineNumber)
-    # elif re.search(regex.typeString, indexCounter): # String
-    #   print("Found token type String:   " , indexCounter , " in indexCounter " , lineNumber)
-    # elif re.search(regex.typeboolean, indexCounter): # Boolean
-    #   print("Found token type Boolean:  " , indexCounter , " in indexCounter " , lineNumber)
-    # elif re.search(regex.boolFalse, indexCounter): # False
-    #   print("Found token boolean false: " , indexCounter , " in indexCounter " , lineNumber)
-    # elif re.search(regex.boolTrue, indexCounter): # True
-    #   print("Found token boolean True:  " , indexCounter , " in indexCounter " , lineNumber)
-    # else: # if none were found, then print as character 
-    #   print("character: ", indexCounter , " in indexCounter " , lineNumber)
-      # newList = list(indexCounter) # This splits characters into one
-      # indexCounter = 0
-      # lastIndex = len(newList)
-      # # This is to remove the l
-      # if indexCounter < len(newList):      
-      #   if newList[lastIndex-1] == "\n":
-      #     lineNumber+=1
-      #     del newList[lastIndex-1]
-      #     while indexCounter < len(newList):
-      #       print("character: ", newList[indexCounter] , " in indexCounter " , lineNumber)
-      #       indexCounter+=1
-  # End of character elif
-  
+    programNumber+=1 
   indexCounter+=1
   if errorCounter > 0:
     print("ERROR!! Please fix error in line " , lineNumber)
