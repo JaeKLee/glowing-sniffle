@@ -23,7 +23,6 @@ while indexCounter < len(listFile):
   if re.search(r"[^\s]", listFile[indexCounter]):
     print("Program " , programNumber , " starting....")
     running=not running # This should equal to True
-  indexCounter+=1
   while running:
     if re.search(regex.leftParen, listFile[indexCounter]):
       print("Found token LEFT PAREN: " , listFile[indexCounter],   " in line " , lineNumber)
@@ -44,7 +43,7 @@ while indexCounter < len(listFile):
             indexCounter+=1
           elif re.search(r"n", listFile[indexCounter+1]) and re.search(r"t", listFile[indexCounter+2]) and indexCounter+1 < len(listFile):
             print("Found token INT : int in line " , lineNumber)
-            indexCounter+=3
+            indexCounter+=2
         else: 
           print(listFile[indexCounter],"before finding i?")
           print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
@@ -146,7 +145,10 @@ while indexCounter < len(listFile):
       errorCounter+=1
       break
     indexCounter+=1
-  # End of running while-loop 
+    # End of running while-loop
+  if (indexCounter < len(listFile)) and re.match(r"\n", listFile[indexCounter]): # LINE NUMBER COUNTER
+    lineNumber+=1 
+  indexCounter+=1
 # End of while-loop
 
 if re.search(r"[\s]", listFile[lastIndex]) or re.search(r"[^\$]", listFile[lastIndex]):
