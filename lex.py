@@ -7,27 +7,26 @@ import regex
 open_file = open("test_alan.txt", "r")
 
 listFile = list(open_file.read())
-# print(listFile)
-
+open_file.close()
+# Variables
 lineNumber = 1
 programNumber = 1
 indexCounter = 0
-nextIndex = indexCounter+1
 empty = "" # To improve code readability
 errorCounter = 0
 warningCounter = 0
-print(listFile)
-emptyList = []
+lastIndex = len(listFile)-1
+
 
 while indexCounter < len(listFile):
   if re.search(regex.leftParen, listFile[indexCounter]):
-    print("Found token LEFT PAREN:    " , listFile[indexCounter],   " in line " , lineNumber)
+    print("Found token LEFT PAREN: " , listFile[indexCounter],   " in line " , lineNumber)
   elif re.search(regex.rightParen, listFile[indexCounter]):
-    print("Found token RIGHT PAREN:   " , listFile[indexCounter] ,  " in line " , lineNumber)
+    print("Found token RIGHT PAREN: " , listFile[indexCounter] ,  " in line " , lineNumber)
   elif re.search(regex.leftBrace, listFile[indexCounter]):
-    print("Found token LEFT BRACE:   " , listFile[indexCounter] , " in line ", lineNumber)
+    print("Found token LEFT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
   elif re.search(regex.rightBrace, listFile[indexCounter]):
-    print("Found token RIGHT BRACE:   " , listFile[indexCounter] , " in line ", lineNumber)
+    print("Found token RIGHT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
 # First it detects for any letters and depending on what it finds, it will loop until there are no more letters
   elif re.search(regex.character, listFile[indexCounter]):
     if re.search(r"i", listFile[indexCounter]): # IF or INT
@@ -104,45 +103,68 @@ while indexCounter < len(listFile):
         indexCounter+=1
         continue
     else: 
-      # All ID that that are found
+      # All characters that are not reserved words
       print("Found token ID : " , listFile[indexCounter] , " in line " , lineNumber)
     # End of big word if statement
-  elif re.search(regex.quote, listFile[indexCounter]):
+  elif re.search(regex.quote, listFile[indexCounter]): # QUOTE
     print("Found token START QUOTE : " , listFile[indexCounter] , " in line ", lineNumber)
     if (indexCounter+1 < len(listFile)):
       indexCounter+=1
-      while re.search(r"[^\"]", listFile[indexCounter]):
+      while re.search(r"[^\"]", listFile[indexCounter]): # CHARLIST
         print("Found token CHAR : " , listFile[indexCounter], " in line " , lineNumber)
         indexCounter+=1
     print("Found token END QUOTE : " , listFile[indexCounter], " in line ", lineNumber)
-  elif re.search(r"!", listFile[indexCounter]):
+  elif re.search(r"!", listFile[indexCounter]): # NOT EQUAL
     if re.search(r"=", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile):
       print("Found token NOT EQUAL : != in line ", lineNumber)
-    else: 
+    else: # There is no such thing as standalone ' ! ' mark in our grammar
       errorCounter+=1
       break
-  elif re.search(regex.assign, listFile[indexCounter]):
-    print("Found token assignment:    " , listFile[indexCounter] , " in line " , lineNumber)
+  elif re.search(regex.assign, listFile[indexCounter]): # ASSIGNMENT
+    print("Found token assignment : " , listFile[indexCounter] , " in line " , lineNumber)
     indexCounter+=1
-    if indexCounter < len(listFile) and re.search(r"=", listFile[indexCounter]):
+    if indexCounter < len(listFile) and re.search(r"=", listFile[indexCounter]): # EQUAL
       print("Found token EQUAL :  ==  in line " , lineNumber)
       indexCounter+=1
-  elif re.search(r"[0-9]", listFile[indexCounter]):
+    continue
+  elif re.findall(regex.digit, listFile[indexCounter]): # DIGIT
     print("Found token DIGIT : " , listFile[indexCounter] , " in line " , lineNumber)
-  elif re.search(r"\+", listFile[indexCounter]):
+  elif re.search(r"\+", listFile[indexCounter]): # INTOP / PLUS SIGN
     print("Found token INTOP : " , listFile[indexCounter] , " in line " , lineNumber)
-  elif re.search(r"/", listFile[indexCounter]): 
-    if re.search(r"\*", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile): 
-      # indexCounter did not actually increment, so adding +2 & +3 to check for the element
-      while re.search(r"[^\*]", listFile[indexCounter+2]) and re.search(r"[^/]", listFile[indexCounter+3]):
-        indexCounter+=1
-      indexCounter+=3 # This actually increments the index, so it can continue
-  elif re.match(r"\n", listFile[indexCounter]):
+  elif re.search(r"/", listFile[indexCounter]) and re.search(r"\*", listFile[indexCounter+1]): # COMMENT
+    indexCounter+=2 # indexCounter moves to the content of the comment
+    # print(listFile[indexCounter])
+    if (indexCounter+1) < len(listFile): 
+      while re.search(r"[^\*]", listFile[indexCounter]) and re.search(r"[^/]", listFile[indexCounter+1]):
+        indexCounter+=1 # Ignore comments
+      indexCounter+=2 # indexCounter moves out of the comment
+      continue
+    # END OF COMMENT
+  elif re.match(r"\n", listFile[indexCounter]): # LINE NUMBER COUNTER
     lineNumber+=1
-    indexCounter+=1
   elif re.compile(regex.eop).search(listFile[indexCounter]):
     print("End of Program detected:  ", listFile[indexCounter], " in line " , lineNumber , "\n")  
     programNumber+=1
-  indexCounter+=1
-  if errorCounter > 0:
-    print("ERROR!! Please fix error in line " , lineNumber)
+    # indexCounter+=1
+  elif re.search(r"[\s]", listFile[indexCounter]): # SPACE
+    # print("space found")
+    indexCounter+=1
+    continue
+  else:
+    errorCounter+=1
+    break
+  indexCounter+=1 
+
+
+if re.search(r"[\s]", listFile[lastIndex]):
+  if re.search(r"[^\$]", listFile[lastIndex]):
+    listFile.append("$")
+    print("\nEOP is not found, adding EOP at the end of last program")
+    warningCounter+=1
+  else:
+    lastIndex-=1
+
+if errorCounter > 0:
+  print("ERROR!! Please fix error in line " , lineNumber)
+elif warningCounter > 0:
+  print("Found " , warningCounter , " warning(s) in LEXER")
