@@ -17,6 +17,7 @@ errorCounter = 0
 warningCounter = 0
 lastIndex = len(listFile)-1
 
+print(listFile)
 
 while indexCounter < len(listFile):
   if re.search(regex.leftParen, listFile[indexCounter]):
@@ -103,7 +104,7 @@ while indexCounter < len(listFile):
   elif re.search(r"!", listFile[indexCounter]): # NOT EQUAL
     if re.search(r"=", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile):
       print("Found token NOT EQUAL : != in line ", lineNumber)
-    else: # There is no such thing as standalone ' ! ' mark in our grammar
+    else: # There is no such thing as standalone ' ! ' mark in our grammar = ERROR
       errorCounter+=1
       break
   elif re.search(regex.assign, listFile[indexCounter]): # ASSIGNMENT
@@ -125,13 +126,14 @@ while indexCounter < len(listFile):
         indexCounter+=1 # Ignore comments
       indexCounter+=2 # indexCounter moves out of the comment
       continue
-    # END OF COMMENT
+    # END OF COMMENT if-statement
   elif re.match(r"\n", listFile[indexCounter]): # LINE NUMBER COUNTER
     lineNumber+=1
   elif re.compile(regex.eop).search(listFile[indexCounter]):
     print("End of Program detected:  ", listFile[indexCounter], " in line " , lineNumber , "\n")  
     programNumber+=1
   elif re.search(r"[\s]", listFile[indexCounter]): # SPACE
+    # Could not leave this if statement empty, so increment indexCounter and go back to the top
     indexCounter+=1
     continue
   else:
@@ -139,14 +141,14 @@ while indexCounter < len(listFile):
     break
   indexCounter+=1 
 
-
 if re.search(r"[\s]", listFile[lastIndex]):
+  # To get to the last element that isn't a white space
+  while re.search(r"[\s]", listFile[lastIndex]):
+    lastIndex-=1
   if re.search(r"[^\$]", listFile[lastIndex]):
     listFile.append("$")
-    print("\nEOP is not found, adding EOP at the end of last program")
+    print("\nEOP is not found at the end of last program. Adding EOP at ", lineNumber)
     warningCounter+=1
-  else:
-    lastIndex-=1
 
 if errorCounter > 0:
   print("ERROR!! Please fix error in line " , lineNumber)
