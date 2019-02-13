@@ -5,9 +5,11 @@ import regex
 
 # Opening as read mode to read the test files
 open_file = open("test_alan.txt", "r")
-
+# Creating list of individual contents in the file
 listFile = list(open_file.read())
+# Close file
 open_file.close()
+
 # Variables
 lineNumber = 1
 programNumber = 1
@@ -19,10 +21,12 @@ lastIndex = len(listFile)-1
 running = False
 
 print("LEXER")
+# This while is to print Program starting statement
 while indexCounter < len(listFile):
   if re.search(r"[^\s]", listFile[indexCounter]):
     print("Program " , programNumber , " starting....")
     running=not running # This should equal to True
+  # This while will actually go through the list and do the lexing
   while running:
     if re.search(regex.leftParen, listFile[indexCounter]):
       print("Found token LEFT PAREN: " , listFile[indexCounter],   " in line " , lineNumber)
@@ -32,6 +36,7 @@ while indexCounter < len(listFile):
       print("Found token LEFT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
     elif re.search(regex.rightBrace, listFile[indexCounter]):
       print("Found token RIGHT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
+    
     # First it detects for any letters and depending on what it finds, it will loop until there are no more letters
     elif re.search(regex.character, listFile[indexCounter]):
       if re.search(r"i", listFile[indexCounter]): # IF or INT
@@ -40,16 +45,17 @@ while indexCounter < len(listFile):
           # indexCounter+=1 
           if re.search(r"f", listFile[indexCounter+1]):
             print("Found token IF : if in line " , lineNumber)
-            indexCounter+=1
+            indexCounter+=1 # This will reach ' f ' after i
           elif re.search(r"n", listFile[indexCounter+1]) and re.search(r"t", listFile[indexCounter+2]) and indexCounter+1 < len(listFile):
             print("Found token INT : int in line " , lineNumber)
-            indexCounter+=2
+            indexCounter+=2 # This will reach ' t ' after in
         else: 
-          print(listFile[indexCounter],"before finding i?")
           print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
+      
       elif re.search(r"w", listFile[indexCounter]): # WHILE
-        # It starts +4 because it's after "w"
+        # This first checks to see if index exists to identify the word WHILE
         if indexCounter+4 < len(listFile) and re.search(r"h", listFile[indexCounter+1]) and re.search(r"i", listFile[indexCounter+2]) and re.search(r"l", listFile[indexCounter+3]) and re.search(r"e", listFile[indexCounter+4]):
+          # If there exist an index and every index within matches h i l e then, we found WHILE
           print("Found token WHILE : while in line " ,  lineNumber)
           # Incrementing by the number of letters in the reserved word
           indexCounter+=5 
