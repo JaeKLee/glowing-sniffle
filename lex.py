@@ -1,6 +1,7 @@
 # Author: Jae Kyoung Lee (LJ)
 import re
 # Importing list of our grammar regex from regex.py
+# Please ensure that you have downloaded regex.py as well
 import regex
 
 # Opening as read mode to read the test files
