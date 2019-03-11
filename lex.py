@@ -35,7 +35,7 @@ while indexCounter < len(listFile):
       print("Program " , programNumber , " starting....")
       running=not running # This should equal to True
     # This while will actually go through the list and do the lexing
-    while running:
+    while running and indexCounter+1 < len(listFile):
       if re.search(regex.leftParen, listFile[indexCounter]):
         tokenList.append(listFile[indexCounter])
         print("Found token LEFT PAREN: " , listFile[indexCounter],   " in line " , lineNumber)
@@ -121,19 +121,28 @@ while indexCounter < len(listFile):
         print("Found token START QUOTE : " , listFile[indexCounter] , " in line ", lineNumber)
         if (indexCounter+1 < len(listFile)):
           indexCounter+=1
-          while re.search(r"[^\"]", listFile[indexCounter]): # CHARLIST
-            if re.search(r"[a-z]", listFile[indexCounter]):
+          if re.search(r"[^\"]", listFile[indexCounter]) and indexCounter+1 < len(listFile): # CHARLIST
+            while re.search(r"[a-z]|[\t]|[ ]", listFile[indexCounter]) or re.search(r"/", listFile[indexCounter]) and re.search(r"\*", listFile[indexCounter+1]):
               print("Found token CHAR : " , listFile[indexCounter], " in line " , lineNumber)
               indexCounter+=1
-            else:
-              errorCounter+=1
-              errorCheck = not errorCheck
-              while re.search(r"[^\"]", listFile[indexCounter]):
-                print(listFile[indexCounter])
-                indexCounter+=1
-              break
+              while re.search(r"/", listFile[indexCounter]) and re.search(r"\*", listFile[indexCounter+1]): # COMMENT
+                  # indexCounter moves to the content of the comment
+                  indexCounter+=2
+                  if (indexCounter+1) < len(listFile): 
+                    while re.search(r"[^\*]", listFile[indexCounter]) and re.search(r"[^/]", listFile[indexCounter+1]):
+                      indexCounter+=1 # Ignore comments
+                    indexCounter+=2 # indexCounter moves out of the comment
             if re.search(regex.quote, listFile[indexCounter]):
               print("Found token END QUOTE : " , listFile[indexCounter], " in line ", lineNumber)
+            else:# re.search(r"[^a-z]|[^\t]|[^ ]|[^\"]", listFile[indexCounter]):
+                errorCounter+=1
+                errorCheck = not errorCheck
+                while re.search(r"[^\"]", listFile[indexCounter]) and indexCounter+1 < len(listFile):
+                  # print(listFile[indexCounter])
+                  if re.search(regex.newLine, listFile[indexCounter]):
+                    lineNumber+=1
+                  indexCounter+=1
+                break  
       elif re.search(r"!", listFile[indexCounter]): # NOT EQUAL
         if re.search(r"=", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile):
           print("Found token NOT EQUAL : != in line ", lineNumber)
@@ -176,16 +185,19 @@ while indexCounter < len(listFile):
         continue
       else:
         errorCounter+=1
+        errorCheck = not errorCheck
         break
       indexCounter+=1
       # End of running while-loop
     # End of errorCheck if statement
   elif not errorCheck: # If there are any errors, 
     if errorCounter > 0:
-      print("ERROR!! Please fix error in line " , lineNumber , " by fixing invalid character")
+      print("ERROR!! Please fix error in line " , lineNumber , " by fixing invalid character\n")
       while re.search(r"[^$]", listFile[indexCounter]):
+        if re.search(regex.newLine, listFile[indexCounter]):
+          lineNumber+=1
         indexCounter+=1
-    print(listFile[indexCounter], "printing inside errorCheck")
+    # print(listFile[indexCounter], "printing inside errorCheck")
     if re.compile(regex.eop).search(listFile[indexCounter]):
       programNumber+=1
       errorCounter=0
