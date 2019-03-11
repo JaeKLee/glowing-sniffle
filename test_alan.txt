@@ -1,30 +1,14 @@
-{{
-  int a = 2
-  int b = 4
-  string c$
-  if (a == b)
-  {
-    c = "even"
-  }$      
-  if (a != b)
-  {
-    c = "odd"$
-  }
+{"$"}$
 
-  print(c)
-}}$
+{"two
+line"}$
 
-/*LongTestCase-EverythingExceptBooleanDeclaration*/{/*IntDeclaration*/intaintba=0b=0/*WhileLoop*/while(a!=3){print(a)while(b!=3){print(b)b=1+bif(b==2){/*PrintStatement*/print("there is no spoon"/*Thiswilldonothing*/)}}b=0a=1+a}}$  
-{}$      
-{{{{{{}}}}}}$ 
-{{{{{{}}} /* comments are ignored */ }}}}$ 
-{ /* comments are still ignored */ int}$
+{print("No Caps Mister Bond")}$
 
-{    
-  int a    
-  a = a    
-  string b    
-  a = b 
+print("no digits 007")$
+
+{int A}$
+
+{~!@#$%^&*()_+{}|:"<>?[];',./
+bool ean d 
 }$
-
-{ /* comments are still ignored */ int}$
