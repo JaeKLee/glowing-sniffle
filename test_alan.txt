@@ -1,20 +1,3 @@
-{"$"}$
-
-{"two
-line"}$
-
-{print("No Caps Mister Bond")}$
-
-{print("no digits 007")}$
-
-{int A}$
-
 {
-  ~!@#%^&*_+{}|:<>?[];',./
-  bool ean d 
-}$
-
-{ 
-  string s
-  s = "this string is /* in */ visible"
-}$
+    ()
+}

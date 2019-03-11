@@ -1,7 +1,12 @@
+class Token:
+  def __init__(self, tokenKind, tokenValue, lineNumber):
+    self.kind = tokenKind
+    self.value = tokenValue
+    self.lineNum = lineNumber
 
-# tokenList = ['test']
+# kindList = []
+# tokenList = []
+# lineList = []
 
-
-# i = 0
-# while i < len(tokenList):
-#   print(tokenList[i])
+# def createToken(self, kind, value, lineNum):
+#   tokenList.append(kind, value, lineNum)
