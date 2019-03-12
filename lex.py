@@ -48,15 +48,16 @@ def lex(listFile):
       # This while will actually go through the list and do the lexing
       while running and indexCounter+1 < len(listFile):
         if re.search(regex.leftParen, listFile[indexCounter]):
-          createToken("LEFT PAREN", listFile[indexCounter], lineNumber)
+          createToken("T_LPAREN", listFile[indexCounter], lineNumber)
           print("Found token LEFT PAREN: " , listFile[indexCounter],   " in line " , lineNumber)
         elif re.search(regex.rightParen, listFile[indexCounter]):
+          createToken("T_RPAREN", listFile[indexCounter], lineNumber)
           print("Found token RIGHT PAREN: " , listFile[indexCounter] ,  " in line " , lineNumber)
         elif re.search(regex.leftBrace, listFile[indexCounter]):
-          createToken("LEFT BRACE", listFile[indexCounter], lineNumber)
+          createToken("T_LBRACE", listFile[indexCounter], lineNumber)
           print("Found token LEFT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
         elif re.search(regex.rightBrace, listFile[indexCounter]):
-          createToken("RIGHT BRACE", listFile[indexCounter], lineNumber)
+          createToken("T_RBRACE", listFile[indexCounter], lineNumber)
           print("Found token RIGHT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
         
         # First it detects for any letters and depending on what it finds, it will loop until there are no more letters
