@@ -22,24 +22,26 @@ tokenList = lex.lex(listFile)
 print(len(tokenList))
 
 print("\nPARSER")
-# i=0
-# while i < len(tokenList):
-#   print(tokenList[i].value)
-#   # print(token.lineList[i])  
-#   i+=1  
+i=0
+while i < len(tokenList):
+  print(tokenList[i].value)
+  # print(token.lineList[i])  
+  i+=1  
 
 def match(expectedToken):
   global tokenIndex
   notVal = False
-  print(tokenList[tokenIndex].value)
-  if expectedToken == tokenList[tokenIndex].value:
-    notVal = True
-  tokenIndex+=1  
+  # print(tokenList[tokenIndex].kind)
+  if expectedToken == tokenList[tokenIndex].kind:
+    notVal = True  
+    # print(notVal)
+  # tokenIndex+=1
+  # print(notVal)
   return notVal
   
 def printErrorStmt(expectedToken):
   global tokenIndex    
-  lastIndex = tokenIndex - 1
+  # lastIndex = tokenIndex - 1
   # print(tokenList[tokenIndex].value)
   print("Failed - Expected ", expectedToken,  " but found " ,  tokenList[tokenIndex].kind , " with value '" ,  tokenList[tokenIndex].value , "' on line " ,  tokenList[tokenIndex].lineNum)
   print("Parse failed with 1 error")
@@ -51,134 +53,122 @@ def printErrorStmt(expectedToken):
 
 def printValidStmt(expectedToken):
   global tokenIndex
-  tokenIndex-=1
+  # tokenIndex-=1
   print("Valid - Expected ", expectedToken,  " and got " ,  tokenList[tokenIndex].kind , " with value '" ,  tokenList[tokenIndex].value , "' on line " ,  tokenList[tokenIndex].lineNum)
   tokenIndex+=1
 
-def parseOp():
-  if match("+") is True: 
-    print("parseOp()")
-  else:
-    printErrorStmt("+")
-
-def parseBoolVal():
-  if match(regex.digit) is True or match("true") is True:
-    print("parseBoolVal")
-  else: 
-    printErrorStmt("false|true")
-
 def parseBoolOp():
-  if match("==") is True:
-    print("parseBoolOp")
+  print("parseBoolOp()") 
+  if match("T_BOOLOP") is True:
+    printValidStmt("T_BOOLOP")
   else:
-    printErrorStmt("==")
-  if match("!=") is True:
-    print("parseBoolOp()")
-  else:
-    printErrorStmt("!=")
-
-def parseDigit(): 
-  if match(r"[0-9]") is True:
-    print("parseDigit()")
-  else:
-    printErrorStmt("digits")
-
-def parseSpace():
-  if match(r"\s") is True:
-    print("parseSpace()")
-  else:
-    printErrorStmt("space")
+    printErrorStmt("T_BOOLOP")
 
 def parseChar():
-  if match(r"[a-z]") is True:
+  if match("T_CHAR") is True:
     print("parseChar()")
 
-def parseType():
-  if match("int"):
-    print("parseType")
-  # else:
-  #   printErrorStmt("T_INT")
-  elif match("string"):
-    print("parseType")
-  # else:
-  #   printErrorStmt("T_STRING")
-  elif match("boolean"):
-    print("parseType")
-  else:
-    printErrorStmt(tokenList[tokenIndex].kind)
-
 def parseCharList():
-  if parseChar() and parseCharList():
-    print("parseCharList()")
-  else: 
-    printErrorStmt("T_CHAR")
-  if parseSpace() and parseCharList():
-    print("parseCharList()")
-  else:
-    printErrorStmt("T_SPACE")
+  print("parseCharList()")
+  if match("T_CHAR") is True:
+    printValidStmt("T_CHAR")
+    parseChar()
+    parseCharList()
+  elif tokenList[tokenIndex].value == " ":
+    printValidStmt("T_SPACE")
+    parseCharList()
 
 def parseID():
-  printValidStmt("T_ID")
+  printValidStmt("T_ID parseID")
   parseChar()
 
+def parseExpr():
+  print("parseExpr()")
+  if tokenList[tokenIndex].kind == "T_DIGIT":
+    parseIntExpr()
+  elif tokenList[tokenIndex].kind == "T_QUOTE":
+    parseStringExpr() 
+  elif tokenList[tokenIndex].kind == "T_RPAREN":
+    parseBooleanExpr()
+  else:
+    parseID()
+  # else: 
+  #   printErrorStmt("that's not true")
+
 def parseBooleanExpr():
-  if match(r"(") is True and parseExpr() and parseBoolOp() and parseExpr() and match(r")") is True:
-    print("parseBooleanExpr")
+  print("parseBooleanExpr")
+  if match("T_LPAREN") is True:
+    printValidStmt("T_LPAREN")
+    parseExpr()
+    parseBoolOp()
+    parseExpr()
+    if match("T_RPAREN") is True:
+      printValidStmt("T_RPAREN")
+    else:
+      printErrorStmt("T_RPAREN")
   else:
     printErrorStmt("this is wrong")
 
 def parseStringExpr():
-  if match(r"\"") is True and parseCharList() and match(r"\""):
-    print("parseStringExpr()")
+  print("parseStringExpr()")
+  if match("T_QUOTE") is True:
+    printValidStmt("T_QUOTE")
+    parseCharList() 
+    if match("T_QUOTE") is True:
+      printValidStmt("T_QUOTE")
   else: 
-    print("parsestring wrong")
+    print("parse string wrong")
 
 def parseIntExpr():
-  if parseDigit() and parseOp() and parseExpr():
-    print("parseIntExpr()")
+  print("parseIntExpr()")
+  if match("T_DIGIT") is True:
+    printValidStmt("T_DIGIT")
+    if match("T_OP") is True:
+      printValidStmt("T_OP")
+      parseExpr()
   else:
-    printErrorStmt("digits or +")
-
-def parseExpr():
-  if parseStringExpr() or parseBooleanExpr() or parseID():
-    print("parseExpr()")
-  else: 
-    printErrorStmt("that's not true")
+    printErrorStmt("T_DIGIT")
 
 def parseBlock():
   print("parseBlock()")
-  if match("{") is True:
-    printValidStmt("T_RBRACE")
+  if match("T_LBRACE") is True:
+    printValidStmt("T_LBRACE")
     parseStatementList()
-    if match("}") is True: 
-      print("true right brace it is")
-    print("true")
+    if match("T_RBRACE") is True: 
+      printValidStmt("T_RBRACE")
   else:
-    if match("{") is False:
-      printErrorStmt("{")
-    elif match("}") is False:
-      printErrorStmt("}")
+    if match("T_LBRACE") is False:
+      printErrorStmt("T_LBRACE")
+    elif match("T_RBRACE") is False:
+      printErrorStmt("T_RBRACE")
 
 def parseIf():
-  if match("if") and parseBooleanExpr() and parseBlock():
-    print("parseIf()")
+  print("parseIf()")
+  if match("T_IF") is True:
+    printValidStmt("T_IF")
+    parseBooleanExpr()
+    parseBlock()
   else:
-    print("parseIf wrong")
+    printErrorStmt("T_IF")
 
 def parseWhile():
-  if match("while") and parseBooleanExpr() and parseBlock():
-    print("parseWhile()")
+  print("parseWhile()")  
+  if match("T_WHILE") is True:
+    printValidStmt("T_WHILE")
+    parseBooleanExpr()
+    parseBlock()
   else:
-    print("parseWhile wrong")
+    printErrorStmt("T_WHILE")
 
 def parseVarDecl():
   global tokenIndex
   print("parseVarDecl()")
   # if tokenList[tokenIndex].value == "int" or tokenList[tokenIndex].value == "string" or tokenList[tokenIndex].value == "boolean":
-  if match("int") is True or match("string") is True or match("boolean") is True:
-    tokenIndex-=1
+  # if match("T_TYPE"):
+  if tokenList[tokenIndex].kind == "T_TYPE":
+    # tokenIndex-=1
     printValidStmt("T_TYPE")
-    tokenIndex+=1
+    # tokenIndex+=1
     parseID()
   else:
     printErrorStmt("VARDECL")
@@ -186,23 +176,30 @@ def parseVarDecl():
 def parseAssignment():
   print("parseAssignment()")
   # if re.match(regex.character, tokenList[tokenIndex].value):
-  if match(regex.character) is True:
-    printValidStmt("T_ID")
-    if match(r"=") is True: 
-      printValidStmt("=")
+  if match("T_ID") is True:
+    parseID()
+    # printValidStmt("T_ID")
+    if match("T_ASSIGN") is True: 
+      printValidStmt("T_ASSIGN")
       parseExpr()
   else:
     printErrorStmt("parseAssignment is wrong")
 
 def parsePrint():
-  if match(r"print") is True:
-    if match(r"(") is True:
+  print("parsePrint()")
+  if match("T_PRINT") is True:
+    printValidStmt("T_PRINT")
+    if match("T_LPAREN") is True:
+      printValidStmt("T_LPAREN")
       parseExpr()
-    if match(r")") is True:
-      print("parsePrint()")
+    else:
+      printErrorStmt("T_LPARENT")
+    if match("T_RPAREN") is True:
+      printValidStmt("T_RPAREN")
+    else:
+      printErrorStmt("T_RPAREN")
   else:
-    print("parseprint error")
-    printErrorStmt("print(Expr)")
+    printErrorStmt("T_PRINT")
 
 # def epsilon():
 
@@ -210,9 +207,10 @@ def parsePrint():
 def parseStatementList():
   global tokenIndex
   print("parseStatementList()")
-  if tokenList[tokenIndex].value == "}" or tokenList[tokenIndex].value == "$":
-    tokenIndex+=1
-  else:
+  print(tokenList[tokenIndex].kind)
+  if match("T_RBRACE") is True or match("T_EOP") is True:
+    print("true statement")
+  else: 
     parseStatement()
     parseStatementList()
   # if parseStatement() and parseStatementList():
@@ -224,77 +222,29 @@ def parseStatementList():
 def parseStatement():
   global tokenIndex
   print("parseStatement()")
-  while tokenIndex+1 < len(tokenList):
-    if tokenList[tokenIndex].kind == "T_PRINT":
-      # print("parseStatement()")
-      parsePrint()
-    # elif re.match(r"[a-z]", tokenList[tokenIndex].value):
-    elif tokenList[tokenIndex].kind == "T_ID":
-      # print("parseStatement()")
-      parseAssignment()
-    # elif tokenList[tokenIndex].value == r"[int]|[string]|[boolean]|[a-z]": 
-    elif tokenList[tokenIndex].value == "int" or tokenList[tokenIndex].value == "string" or tokenList[tokenIndex].value == "boolean":
-      # print("parseStatement()")
-      parseVarDecl()
-    elif tokenList[tokenIndex].value == "while":
-      # print("parseStatement()")
-      parseWhile()
-    elif tokenList[tokenIndex].value == "if":
-      # print("parseStatement()")
-      parseIf()
-    elif tokenList[tokenIndex].value == "{":
-      # print("parseStatement()")
-      parseBlock()
-    else:
-      printErrorStmt("print|==|type|ID|while|if|{")
-    
-  # if match("print") is True:
-  #   parsePrint()
-  #   print("parseStatement()")
-  # else:
-  #   printErrorStmt("parsePrint()")
-
-  # if match("")
-  #   parseAssignment()
-  #   print("parseStatement()")
-  # else:
-  #   printErrorStmt("parseAssignment()")
-
-  # if parseVarDecl():
-  #   print("parseStatement()")
-  # else:
-  #   printErrorStmt("parseVarDecl()")
-
-  # if parseWhile():
-  #   print("parseStatement()")
-  # else:
-  #   printErrorStmt("parseWhile")
-
-  # if parseIf():
-  #   print("parseStatement()")
-  # else:
-  #   printErrorStmt("parseIf")
-
-  # if parseBlock():
-  #   print("parseStatement()")
-  # else:
-  #   printErrorStmt("parseBlock")
-
+  # while tokenIndex+1 < len(tokenList):
+  if match("T_PRINT") is True:
+    parsePrint()
+  # elif re.match(r"[a-z]", tokenList[tokenIndex].value):
+  elif match("T_ID") is True:
+    parseAssignment()
+  # elif tokenList[tokenIndex].value == r"[int]|[string]|[boolean]|[a-z]": 
+  elif match("T_TYPE") is True:
+    parseVarDecl()
+  elif match("T_WHILE") is True:
+    parseWhile()
+  elif match("T_IF"):
+    parseIf()
+  elif match("T_LBRACE") is True:
+    parseBlock()
 
 def parseProgram():
   print("parseProgram()")
   parseBlock()
+  printValidStmt("T_EOP")
 
 def parse():
   print("parse()")
   parseProgram()
 
-# def getNextToken():
-#   thisToken = EOP
-#   if tokenIndex < tokens.length:
-#     thisToken =  tokenList[tokenIndex]
-#     print("Current token: ", thisToken)
-#     tokenIndex+=1
-#   return thisToken
-while tokenIndex < len(tokenList):
-  parse()
+parse()

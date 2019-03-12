@@ -1,0 +1,95 @@
+def parseOp():
+  if match("T_OP") is True: 
+    print("parseOp()")
+  else:
+    printErrorStmt("T_OP")
+
+def parseBoolVal():
+  if match("T_FALSE") is True or match("T_TRUE") is True:
+    print("parseBoolVal")
+  else: 
+    printErrorStmt("false|true")
+
+def parseDigit(): 
+  if match("T_DIGIT") is True:
+    printValidStmt("T_DIGIT")
+  else:
+    printErrorStmt("digits")
+
+def parseSpace():
+  if match("T_CHAR") is True:
+    print("parseSpace()")
+  else:
+    printErrorStmt("space")
+
+
+
+def parseType():
+  if match("T_TYPE"):
+    print("parseType")
+  # else:
+  #   printErrorStmt("T_INT")
+  elif match("T_TYPE"):
+    print("parseType")
+  # else:
+  #   printErrorStmt("T_STRING")
+  elif match("T_TYPE"):
+    print("parseType")
+  else:
+    printErrorStmt(tokenList[tokenIndex].kind)
+
+
+
+
+  # if match("print") is True:
+  #   parsePrint()
+  #   print("parseStatement()")
+  # else:
+  #   printErrorStmt("parsePrint()")
+
+  # if match("")
+  #   parseAssignment()
+  #   print("parseStatement()")
+  # else:
+  #   printErrorStmt("parseAssignment()")
+
+  # if parseVarDecl():
+  #   print("parseStatement()")
+  # else:
+  #   printErrorStmt("parseVarDecl()")
+
+  # if parseWhile():
+  #   print("parseStatement()")
+  # else:
+  #   printErrorStmt("parseWhile")
+
+  # if parseIf():
+  #   print("parseStatement()")
+  # else:
+  #   printErrorStmt("parseIf")
+
+  # if parseBlock():
+  #   print("parseStatement()")
+  # else:
+  #   printErrorStmt("parseBlock")
+
+
+
+
+  
+# def getNextToken():
+#   thisToken = EOP
+#   if tokenIndex < tokens.length:
+#     thisToken =  tokenList[tokenIndex]
+#     print("Current token: ", thisToken)
+#     tokenIndex+=1
+#   return thisToken
+# while tokenIndex < len(tokenList):
+
+
+
+# i=0
+# while i < len(tokenList):
+#   print(tokenList[i].value)
+#   # print(token.lineList[i])  
+#   i+=1  

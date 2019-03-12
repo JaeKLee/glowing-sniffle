@@ -3,19 +3,24 @@
 ( = T_LPAREN
 ) = T_RPAREN
 if = T_IF
-int = T_INT
 ID = T_ID
 while = T_WHILE
 print = T_PRINT
-boolean = T_BOOLEAN
-string = T_STRING
-false = T_FALSE
-true = T_TRUE
+
+int = T_TYPE
+boolean = T_TYPE
+string = T_TYPE
+
+false = T_BOOLVAL
+true = T_BOOLVAL
+
 " = T_QUOTE
 char = T_CHAR
-!= = T_NOT_EQUAL
+
+!= = T_BOOLOP
+== = T_BOOLOP
+
 = = T_ASSIGN
-== = T_EQUAL
 0-9 = T_DIGIT
 + = T_OP
 $ = T_EOP

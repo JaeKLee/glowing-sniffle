@@ -61,7 +61,7 @@ def lex(listFile):
           print("Found token RIGHT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
         
         # First it detects for any letters and depending on what it finds, it will loop until there are no more letters
-        elif re.search(regex.character, listFile[indexCounter]):
+        elif re.search(regex.idVal, listFile[indexCounter]):
           if re.search(r"i", listFile[indexCounter]): # IF or INT
             # To avoid index out of range
             if indexCounter+1 < len(listFile) and (re.search(r"f", listFile[indexCounter+1]) or re.search(r"n", listFile[indexCounter+1])) : 
@@ -71,7 +71,7 @@ def lex(listFile):
                 print("Found token IF : if in line " , lineNumber)
                 indexCounter+=1 # This will reach ' f ' after i
               elif re.search(r"n", listFile[indexCounter+1]) and re.search(r"t", listFile[indexCounter+2]) and indexCounter+1 < len(listFile):
-                createToken("T_INT", "int", lineNumber)
+                createToken("T_TYPE", "int", lineNumber)
                 print("Found token INT : int in line " , lineNumber)
                 indexCounter+=2 # This will reach ' t ' after in
             else: 
@@ -102,7 +102,7 @@ def lex(listFile):
               print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
           elif re.search(r"b", listFile[indexCounter]): # BOOLEAN
             if indexCounter+6 < len(listFile) and re.search(r"o", listFile[indexCounter+1]) and re.search(r"o", listFile[indexCounter+2]) and re.search(r"l", listFile[indexCounter+3]) and re.search(r"e", listFile[indexCounter+4]) and re.search(r"a", listFile[indexCounter+5]) and re.search(r"n", listFile[indexCounter+6]):
-                createToken("T_BOOLEAN", "boolean", lineNumber)
+                createToken("T_TYPE", "boolean", lineNumber)
                 print("Found token BOOLEAN : boolean in line " ,  lineNumber)
                 indexCounter+=7
                 continue
@@ -111,7 +111,7 @@ def lex(listFile):
               print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
           elif re.search(r"s", listFile[indexCounter]): # STRING
             if indexCounter+5 < len(listFile) and re.search(r"t", listFile[indexCounter+1]) and re.search(r"r", listFile[indexCounter+2]) and re.search(r"i", listFile[indexCounter+3]) and re.search(r"n", listFile[indexCounter+4]) and re.search(r"g", listFile[indexCounter+5]):
-              createToken("T_STRING", "string", lineNumber)
+              createToken("T_TYPE", "string", lineNumber)
               print("Found token STRING : string in line " ,  lineNumber)
               indexCounter+=6
               continue
@@ -120,12 +120,12 @@ def lex(listFile):
               print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
           elif re.search(r"f", listFile[indexCounter]): # FALSE
             if indexCounter+4 < len(listFile) and re.search(r"a", listFile[indexCounter+1]) and re.search(r"l", listFile[indexCounter+2]) and re.search(r"s", listFile[indexCounter+3]) and re.search(r"e", listFile[indexCounter+4]):
-              createToken("T_FALSE", "false", lineNumber)
+              createToken("T_BOOLVAL", "false", lineNumber)
               print("Found token FALSE : false in line " ,  lineNumber)
               indexCounter+=5
               continue
             elif indexCounter < len(listFile): 
-              createToken("T_ID", listFile[indexCounter], lineNumber)
+              createToken("T_BOOLVAL", listFile[indexCounter], lineNumber)
               print("Found token ID : " , listFile[indexCounter], " in line ", lineNumber)
           elif re.search(r"t", listFile[indexCounter]): # TRUE
             if indexCounter+3 < len(listFile) and re.search(r"r", listFile[indexCounter+1]) and re.search(r"u", listFile[indexCounter+2]) and re.search(r"e", listFile[indexCounter+3]):
@@ -147,7 +147,7 @@ def lex(listFile):
           if (indexCounter+1 < len(listFile)):
             indexCounter+=1
             if re.search(r"[^\"]", listFile[indexCounter]) and indexCounter+1 < len(listFile): # CHARLIST
-              while re.search(r"[a-z]|[\t]|[ ]", listFile[indexCounter]) or re.search(r"/", listFile[indexCounter]) and re.search(r"\*", listFile[indexCounter+1]):
+              while re.search(regex.character, listFile[indexCounter]) or re.search(r"/", listFile[indexCounter]) and re.search(r"\*", listFile[indexCounter+1]):
                 createToken("T_CHAR", listFile[indexCounter], lineNumber)
                 print("Found token CHAR : " , listFile[indexCounter], " in line " , lineNumber)
                 indexCounter+=1
@@ -172,22 +172,23 @@ def lex(listFile):
                   break  
         elif re.search(r"!", listFile[indexCounter]): # NOT EQUAL
           if re.search(r"=", listFile[indexCounter+1]) and (indexCounter+1) < len(listFile):
-            createToken("T_NOT_EQUAL", "!=", lineNumber)
+            createToken("T_BOOLOP", "!=", lineNumber)
             print("Found token NOT EQUAL : != in line ", lineNumber)
+            indexCounter+=1
           # There is no such thing as standalone ' ! ' mark in our grammar = ERROR
           else:   
             errorCounter+=1
             errorCheck = not errorCheck
             break
         elif re.search(regex.assign, listFile[indexCounter]): # ASSIGNMENT
-          createToken("T_ASSIGN", listFile[indexCounter], lineNumber)
-          print("Found token assignment : " , listFile[indexCounter] , " in line " , lineNumber)
-          indexCounter+=1
-          if indexCounter < len(listFile) and re.search(r"=", listFile[indexCounter]): # EQUAL
-            createToken("T_EQUAL", "==", lineNumber)
+          if indexCounter < len(listFile) and re.search(r"=", listFile[indexCounter+1]): # EQUAL
+            createToken("T_BOOLOP", "==", lineNumber)
             print("Found token EQUAL :  ==  in line " , lineNumber)
             indexCounter+=1
-          continue
+          else:
+            createToken("T_ASSIGN", listFile[indexCounter], lineNumber)
+            print("Found token assignment : " , listFile[indexCounter] , " in line " , lineNumber)
+            indexCounter+=1
         elif re.findall(regex.digit, listFile[indexCounter]): # DIGIT
           createToken("T_DIGIT", listFile[indexCounter], lineNumber)
           print("Found token DIGIT : " , listFile[indexCounter] , " in line " , lineNumber)
