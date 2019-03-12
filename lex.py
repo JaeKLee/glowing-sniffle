@@ -176,13 +176,14 @@ def lex(listFile):
           # There is no such thing as standalone ' ! ' mark in our grammar = ERROR
           else:   
             errorCounter+=1
+            errorCheck = not errorCheck
             break
         elif re.search(regex.assign, listFile[indexCounter]): # ASSIGNMENT
           createToken("T_ASSIGN", listFile[indexCounter], lineNumber)
           print("Found token assignment : " , listFile[indexCounter] , " in line " , lineNumber)
           indexCounter+=1
           if indexCounter < len(listFile) and re.search(r"=", listFile[indexCounter]): # EQUAL
-            createToken("T_EQUAL", listFile[indexCounter], lineNumber)
+            createToken("T_EQUAL", "==", lineNumber)
             print("Found token EQUAL :  ==  in line " , lineNumber)
             indexCounter+=1
           continue

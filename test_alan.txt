@@ -1,16 +1,25 @@
-/*Good code from Tienminator*/
+/* Long Test Case - Everything Except Boolean Declaration */
 {
-    int a
-    while (a != 3) {
-        print(1 + 2 + 3)
-        a = 1 + a
-    }
-    if (1+1+1+1+1 == 2+3) {
-        print("addition check")
-    }
-    if (1+5+3 != 8) {
-        print(false)
-    }
-    print((true == true))
-    print((false == false))
-} $
+	/* Int Declaration */
+	int a
+	int b
+
+	a = 0
+	b = 0
+
+	/* While Loop */
+	while (a != 3) {
+    	print(a)
+    	while (b != 3) {
+        		print(b)
+        		b = 1 + b
+        		if (b == 2) {
+			        /* Print Statement */
+            		print("there is no spoon"/* This will do nothing */)
+        		}
+    	}
+
+    	b = 0
+    	a = 1 + a
+	}
+}$
