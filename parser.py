@@ -2,6 +2,7 @@ import token
 import re
 import lex
 import regex
+import tree
 
 EOP = "$"
 tokens = ""
@@ -39,16 +40,15 @@ def match(expectedToken):
 def printErrorStmt(expectedToken):
   global tokenIndex    
   lastIndex = tokenIndex - 1
-  print(tokenList[tokenIndex].value)
+  # print(tokenList[tokenIndex].value)
+  print("Expected ", expectedToken,  " but found " ,  tokenList[tokenIndex].kind , " with value '" ,  tokenList[tokenIndex].value , "' on line " ,  tokenList[tokenIndex].lineNum)
+  print("Parse failed with 1 error")
   # For errors, we skip to the end of the index, so parser doesn't continue
-  while tokenList[tokenIndex].value != "$" and tokenIndex+1 < len(tokenList):
+  while  tokenIndex+1 < len(tokenList) and tokenList[tokenIndex].value != "$":
     tokenIndex+=1
   # Once it reaches the end, it will print out error messages
-  if tokenList[tokenIndex].value == "$" and tokenIndex+1 < len(tokenList):
-    print("Expected ", expectedToken,  " but found " ,  tokenList[tokenIndex].kind , " with value '" ,  tokenList[tokenIndex].value , "' on line " ,  tokenList[tokenIndex].lineNum)
-    print("Parse failed with 1 error")
+  # if tokenIndex+1 < len(tokenList) and tokenList[tokenIndex].value == "$":
   
-
 
 def parseOp():
   if match("+") is True: 
@@ -91,16 +91,16 @@ def parseChar():
 def parseType():
   if match("int"):
     print("parseType")
-  else:
-    printErrorStmt("T_INT")
-  if match("string"):
+  # else:
+  #   printErrorStmt("T_INT")
+  elif match("string"):
+    print("parseType")
+  # else:
+  #   printErrorStmt("T_STRING")
+  elif match("boolean"):
     print("parseType")
   else:
-    printErrorStmt("T_STRING")
-  if match("boolean"):
-    print("parseType")
-  else:
-    printErrorStmt("T_BOOLEAN")
+    printErrorStmt(tokenList[tokenIndex].kind)
 
 def parseCharList():
   if parseChar() and parseCharList():
@@ -186,36 +186,44 @@ def parsePrint():
     print("parseprint error")
     printErrorStmt("print(Expr)")
 
+def epsilon():
+
+
 def parseStatementList():
-  if parseStatement() or parseStatementList():
-    print("parseStatementList()")
-  else:
-    global tokenList
-    tokenList+=1
+  if tokenList[tokenIndex].value == "}" or tokenList[tokenIndex].value == "$":
+
+  parseStatement()
+  parseStatementList()
+  # if parseStatement() and parseStatementList():
+  #   print("parseStatementList()")
+  # else:
+  #   global tokenList
+  #   tokenList+=1
 
 def parseStatement():
   global tokenIndex
-  if tokenList[tokenIndex].value == "print":
-    print("parseStatement()")
-    parsePrint()
-  elif tokenList[tokenIndex].value == "==":
-    print("parseStatement()")
-    parseAssignment()
-  # elif tokenList[tokenIndex].value == r"[int]|[string]|[boolean]|[a-z]": 
-  elif tokenList[tokenIndex].value == "int" or tokenList[tokenIndex].value == "string" or tokenList[tokenIndex].value == "boolean":
-    print("parseStatement()")
-    parseVarDecl()
-  elif tokenList[tokenIndex].value == "while":
-    print("parseStatement()")
-    parseWhile()
-  elif tokenList[tokenIndex].value == "if":
-    print("parseStatement()")
-    parseIf()
-  elif tokenList[tokenIndex].value == "{":
-    print("parseStatement()")
-    parseBlock()
-  else:
-    printErrorStmt("print|==|type|ID|while|if|{")
+  while tokenIndex+1 < len(tokenList):
+    if tokenList[tokenIndex].value == "print":
+      print("parseStatement()")
+      parsePrint()
+    elif tokenList[tokenIndex].value == "==":
+      print("parseStatement()")
+      parseAssignment()
+    # elif tokenList[tokenIndex].value == r"[int]|[string]|[boolean]|[a-z]": 
+    elif tokenList[tokenIndex].value == "int" or tokenList[tokenIndex].value == "string" or tokenList[tokenIndex].value == "boolean":
+      print("parseStatement()")
+      parseVarDecl()
+    elif tokenList[tokenIndex].value == "while":
+      print("parseStatement()")
+      parseWhile()
+    elif tokenList[tokenIndex].value == "if":
+      print("parseStatement()")
+      parseIf()
+    elif tokenList[tokenIndex].value == "{":
+      print("parseStatement()")
+      parseBlock()
+    else:
+      printErrorStmt("print|==|type|ID|while|if|{")
     
   # if match("print") is True:
   #   parsePrint()
@@ -265,7 +273,5 @@ def parse():
 #     print("Current token: ", thisToken)
 #     tokenIndex+=1
 #   return thisToken
-i = 0
-while i < len(tokenList):
+while tokenIndex < len(tokenList):
   parse()
-  i+=1
