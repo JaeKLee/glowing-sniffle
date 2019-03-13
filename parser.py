@@ -8,6 +8,7 @@ rowToken = 0
 columnToken = 0
 errorCounter = 0
 programNumber = 1
+# cst = tree.Tree()
 
 # Opening as read mode to read the test files
 open_file = open("test_alan.txt", "r")
@@ -166,7 +167,7 @@ def parseBlock():
     if parseStatement() is True:
       parseStatementList()
   if match("T_RBRACE") is True:
-    printValidStmt("T_RBRACE in block")
+    printValidStmt("T_RBRACE")
 
 def parseIf():
   print("parseIf()")
@@ -220,11 +221,10 @@ def parsePrint():
   else:
     printErrorStmt("T_PRINT")
 
-
-
 def parseProgram():
   global programNumber, rowToken, columnToken
   print("parseProgram()")
+  # cst.addNode("Program", "branch", "")
   if rowToken < len(tokenList):
     if match("T_LBRACE") is True:
       parseBlock()
