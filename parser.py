@@ -19,12 +19,16 @@ open_file.close()
 tokenList = lex.lex(listFile)
 
 print("\nPARSER")
+for i in tokenList:
+  for j in i:
+    print(j.kind)
 
 def match(expectedToken):
   global rowToken, columnToken
   notVal = False
-  if expectedToken == tokenList[rowToken][columnToken].kind:
-    notVal = True  
+  if rowToken < len(tokenList):
+    if expectedToken == tokenList[rowToken][columnToken].kind:
+      notVal = True  
   return notVal
   
 def printErrorStmt(expectedToken):
@@ -37,8 +41,9 @@ def printErrorStmt(expectedToken):
 
 def printValidStmt(expectedToken):
   global rowToken, columnToken
-  print("Valid - Expected ", expectedToken,  " and got " ,  tokenList[rowToken][columnToken].kind , " with value '" ,  tokenList[rowToken][columnToken].value , "' on line " ,  tokenList[rowToken][columnToken].lineNum)
-  columnToken+=1
+  if rowToken < len(tokenList):
+    print("Valid - Expected ", expectedToken,  " and got " ,  tokenList[rowToken][columnToken].kind , " with value '" ,  tokenList[rowToken][columnToken].value , "' on line " ,  tokenList[rowToken][columnToken].lineNum)
+    columnToken+=1
 
 def parseBoolOp():
   print("parseBoolOp()") 
@@ -53,15 +58,13 @@ def parseChar():
 
 def parseCharList():
   print("parseCharList()")
-  for row in tokenList:
-    for tokenVal in row:
-      if match("T_CHAR") is True:
-        printValidStmt("T_CHAR")
-        parseChar()
-        parseCharList()
-      elif tokenVal.value == " ":
-        printValidStmt("T_SPACE")
-        parseCharList()
+  if match("T_CHAR") is True:
+    printValidStmt("T_CHAR")
+    parseChar()
+    parseCharList()
+  elif tokenList[rowToken][columnToken].value == " ":
+    printValidStmt("T_SPACE")
+    parseCharList()
 
 def parseID():
   printValidStmt("T_ID parseID")
@@ -112,18 +115,61 @@ def parseIntExpr():
   else:
     printErrorStmt("T_DIGIT")
 
+def parseStatement():
+  global rowToken, columnToken
+  notVal = False
+  if match("T_PRINT") is True:
+    print("parseStatement()")
+    notVal = True
+    parsePrint()
+  elif match("T_ID") is True:
+    print("parseStatement()")
+    notVal = True
+    parseAssignment()
+  elif match("T_TYPE") is True:
+    print("parseStatement()")
+    notVal = True
+    parseVarDecl()
+  elif match("T_WHILE") is True:
+    print("parseStatement()")
+    notVal = True
+    parseWhile()
+  elif match("T_IF") is True:
+    print("parseStatement()")
+    notVal = True
+    parseIf()
+  elif match("T_LBRACE") is True:
+    print("parseStatement()")
+    notVal = True
+    parseBlock()
+  else:#if notVal is False:
+    # printErrorStmt(tokenList[rowToken][columnToken].kind)
+    notVal = False
+  return notVal
+  
+def parseStatementList():
+  if parseStatement() is True:
+    print("parseStatementList()")
+    parseStatement()
+    parseStatementList()
+  elif match("T_RBRACE") is True:
+    printValidStmt("T_RBRACE")
+  # if match("T_EOP") is True:
+  #   parseProgram()
+  #   printValidStmt("T_EOP")
+  # else:
+  #   parseStatement()
+  #   parseStatementList()
+
 def parseBlock():
   print("parseBlock()")
   if match("T_LBRACE") is True:
     printValidStmt("T_LBRACE")
-    parseStatementList()
-    if match("T_RBRACE") is True: 
-      printValidStmt("T_RBRACE")
-  else:
-    if match("T_LBRACE") is False:
-      printErrorStmt("T_LBRACE")
-    elif match("T_RBRACE") is False:
-      printErrorStmt("T_RBRACE")
+    if parseStatement() is True:
+      parseStatementList()
+  # elif match("T_RBRACE") is True: 
+  if match("T_RBRACE") is True:
+    printValidStmt("T_RBRACE in block")
 
 def parseIf():
   print("parseIf()")
@@ -177,47 +223,30 @@ def parsePrint():
   else:
     printErrorStmt("T_PRINT")
 
-def parseStatementList():
-  print("parseStatementList()")
-  if match("T_RBRACE") is True:
-    printValidStmt("T_RBRACE")
-  elif match("T_EOP") is True:
-    print("T_EOP")
-  else: 
-    parseStatement()
-    parseStatementList()
 
-def parseStatement():
-  print("parseStatement()")
-  if match("T_PRINT") is True:
-    parsePrint()
-  elif match("T_ID") is True:
-    parseAssignment()
-  elif match("T_TYPE") is True:
-    parseVarDecl()
-  elif match("T_WHILE") is True:
-    parseWhile()
-  elif match("T_IF"):
-    parseIf()
-  elif match("T_LBRACE") is True:
-    parseBlock()
 
 def parseProgram():
   global programNumber, rowToken, columnToken
   print("parseProgram()")
-  parseBlock()
-  if match("T_EOP") is True:
-    printValidStmt("T_EOP")
-    programNumber+=1
-    rowToken+=1
-    columnToken=0
-    parse()
+  if rowToken < len(tokenList):
+    if match("T_LBRACE") is True:
+      parseBlock()
+    if match("T_EOP") is True:
+      printValidStmt("T_EOP")
+      programNumber+=1
+      rowToken+=1
+      columnToken=0
+      if rowToken < len(tokenList):
+        parse()
 
 def parse():
-  global programNumber    
+  global programNumber, rowToken, columnToken
   print("\nProgram " , programNumber , " starting....")
-  if match("ERROR"):
-    print("PARSER: Skipped due to LEXER error(s)")
+  if match("ERROR") is True:
+    print("Parser: Skipped due to Lexer error(s)\n")
+    rowToken = len(tokenList)
+    columnToken = len(tokenList)
   else:
-    print("parse()")
     parseProgram()
+
+parse()

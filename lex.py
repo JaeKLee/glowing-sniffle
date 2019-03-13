@@ -26,13 +26,13 @@ def lex(listFile):
 
   programList = []
   tokenList = []
-  # class Token:
-  #   def __init__(self, tokenKind, tokenValue, lineNumber):
-  #     self.kind = tokenKind
-  #     self.value = tokenValue
-  #     self.lineNum = lineNumber
+  class Token:
+    def __init__(self, tokenKind, tokenValue, lineNumber):
+      self.kind = tokenKind
+      self.value = tokenValue
+      self.lineNum = lineNumber
   def createToken(kind, value, lineNum):
-    tokens = token.Token(kind, value, lineNum)
+    tokens = Token(kind, value, lineNum)
     tokenList.append(tokens)
 
   print("LEXER")
@@ -151,12 +151,17 @@ def lex(listFile):
                 print("Found token CHAR : " , listFile[indexCounter], " in line " , lineNumber)
                 indexCounter+=1
                 while re.search(r"/", listFile[indexCounter]) and re.search(r"\*", listFile[indexCounter+1]): # COMMENT
-                    # indexCounter moves to the content of the comment
-                    indexCounter+=2
-                    if (indexCounter+1) < len(listFile): 
-                      while re.search(r"[^\*]", listFile[indexCounter]) and re.search(r"[^/]", listFile[indexCounter+1]):
+                  # indexCounter moves to the content of the comment
+                  indexCounter+=2
+                  if (indexCounter+1) < len(listFile): 
+                    while re.search(r"[^\*]", listFile[indexCounter]) and re.search(r"[^/]", listFile[indexCounter+1]):
+                      if re.search(regex.eop, listFile[indexCounter]):
+                        errorCounter+=1
+                        errorCheck = not errorCheck
+                        break
+                      else:
                         indexCounter+=1 # Ignore comments
-                      indexCounter+=2 # indexCounter moves out of the comment
+                    indexCounter+=2 # indexCounter moves out of the comment
               if re.search(regex.quote, listFile[indexCounter]):
                 createToken("T_QUOTE", listFile[indexCounter], lineNumber)
                 print("Found token END QUOTE : " , listFile[indexCounter], " in line ", lineNumber)
