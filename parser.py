@@ -29,12 +29,10 @@ def match(expectedToken):
   
 def printErrorStmt(expectedToken):
   global rowToken, columnToken
-  for tokenVal in tokenList:
-    for tokenTemp in tokenVal:
-      print("Failed - Expected ", expectedToken,  " but found " ,  tokenList[rowToken][columnToken].kind , " with value '" ,  tokenList[rowToken][columnToken].value , "' on line " ,  tokenList[rowToken][columnToken].lineNum)
-      # For errors, we skip to the end of the index, so parser doesn't continue
-      while columnToken+1 < len(tokenList) and tokenList[rowToken][columnToken].value != "$":
-        columnToken+=1
+  print("Failed - Expected ", expectedToken,  " but found " ,  tokenList[rowToken][columnToken].kind , " with value '" ,  tokenList[rowToken][columnToken].value , "' on line " ,  tokenList[rowToken][columnToken].lineNum)
+  # For errors, we skip to the end of the index, so parser doesn't continue
+  while columnToken+1 < len(tokenList) and tokenList[rowToken][columnToken].value != "$":
+    columnToken+=1
   print("Parse failed with 1 error")
 
 def printValidStmt(expectedToken):
@@ -223,5 +221,3 @@ def parse():
   else:
     print("parse()")
     parseProgram()
-
-parse()
