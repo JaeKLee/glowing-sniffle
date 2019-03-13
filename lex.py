@@ -3,17 +3,16 @@ import re
 # Importing list of our grammar regex from regex.py
 # Please ensure that you have downloaded regex.py as well
 import regex
-import parser
 import token
 
-def lex(listFile):
-  # # Opening as read mode to read the test files
-  # open_file = open("test_alan.txt", "r")
-  # # Creating list of individual contents in the file
-  # listFile = list(open_file.read())
-  # # Close file
-  # open_file.close()
+# # Opening as read mode to read the test files
+# open_file = open("test_alan.txt", "r")
+# # Creating list of individual contents in the file
+# listFile = list(open_file.read())
+# # Close file
+# open_file.close()
 
+def lex(listFile):
   # Variables
   lineNumber = 1
   programNumber = 1
@@ -25,16 +24,15 @@ def lex(listFile):
   running = False
   errorCheck = True
 
+  programList = []
   tokenList = []
-
-  class Token:
-    def __init__(self, tokenKind, tokenValue, lineNumber):
-      self.kind = tokenKind
-      self.value = tokenValue
-      self.lineNum = lineNumber
+  # class Token:
+  #   def __init__(self, tokenKind, tokenValue, lineNumber):
+  #     self.kind = tokenKind
+  #     self.value = tokenValue
+  #     self.lineNum = lineNumber
   def createToken(kind, value, lineNum):
-    # tokens = token.Token(kind, value, lineNum)
-    tokens = Token(kind, value, lineNum)
+    tokens = token.Token(kind, value, lineNum)
     tokenList.append(tokens)
 
   print("LEXER")
@@ -44,9 +42,10 @@ def lex(listFile):
       # if re.search(r"[^\s]", listFile[indexCounter]):
       if re.search(regex.leftBrace, listFile[indexCounter]):
         print("Program " , programNumber , " starting....")
+        tokenList = [] # Reset for new program
         running=not running # This should equal to True
       # This while will actually go through the list and do the lexing
-      while running and indexCounter+1 < len(listFile):
+      while running and indexCounter < len(listFile):
         if re.search(regex.leftParen, listFile[indexCounter]):
           createToken("T_LPAREN", listFile[indexCounter], lineNumber)
           print("Found token LEFT PAREN: " , listFile[indexCounter],   " in line " , lineNumber)
@@ -59,8 +58,8 @@ def lex(listFile):
         elif re.search(regex.rightBrace, listFile[indexCounter]):
           createToken("T_RBRACE", listFile[indexCounter], lineNumber)
           print("Found token RIGHT BRACE : " , listFile[indexCounter] , " in line ", lineNumber)
-        
-        # First it detects for any letters and depending on what it finds, it will loop until there are no more letters
+        # First it detects for any letters and depending on what it finds, 
+        # it will loop until there are no more letters
         elif re.search(regex.idVal, listFile[indexCounter]):
           if re.search(r"i", listFile[indexCounter]): # IF or INT
             # To avoid index out of range
@@ -206,16 +205,23 @@ def lex(listFile):
           # END OF COMMENT if-statement
         elif re.match(r"\n", listFile[indexCounter]): # LINE NUMBER COUNTER
           lineNumber+=1
-        elif re.compile(regex.eop).search(listFile[indexCounter]):
-          createToken("T_EOP", listFile[indexCounter], lineNumber)
-          print("End of Program detected:  ", listFile[indexCounter], " in line " , lineNumber , "\n")  
-          programNumber+=1
-          errorCounter=0
-          running = not running # This should equal false  
         elif re.search(regex.space, listFile[indexCounter]): # SPACE
           # Could not leave this if statement empty, so increment indexCounter and go back to the top
           indexCounter+=1
           continue
+        elif re.compile(regex.eop).search(listFile[indexCounter]):
+          createToken("T_EOP", listFile[indexCounter], lineNumber)
+          print("End of Program detected:  ", listFile[indexCounter], " in line " , lineNumber , "\n")  
+          programNumber+=1
+          running = not running # This should equal false 
+          programList.append(tokenList) # To separate tokens into different programs
+
+          # for row in programList:
+          #   # print(row.value)
+          #   for column in row:
+          #     print(column.value)
+
+          errorCounter=0
         else:
           errorCounter+=1
           errorCheck = not errorCheck
@@ -223,9 +229,16 @@ def lex(listFile):
         indexCounter+=1
         # End of running while-loop
       # End of errorCheck if statement
-    elif not errorCheck: # If there are any errors, 
+    elif not errorCheck: # If there are any errors, stop lexing
       if errorCounter > 0:
-        print("ERROR!! Please fix error in line " , lineNumber , " by fixing invalid character\n")
+        print("ERROR!! Please fix error in line " , lineNumber , " by removing invalid character")
+        tokenList = []
+        createToken("ERROR", "ERROR", lineNumber)
+        programList.append(tokenList)
+        tokenList = []
+        # for i in programList:
+        #   for j in i:
+        #     print(j.kind, j.value, j.lineNum)
         while re.search(r"[^$]", listFile[indexCounter]):
           if re.search(regex.newLine, listFile[indexCounter]):
             lineNumber+=1
@@ -254,16 +267,6 @@ def lex(listFile):
   if warningCounter > 0:
     print("Found " , warningCounter , " warning(s) in LEXER")
 
-  return tokenList
 
-  # print("separate")
-  # i = 0
-  # # while running:
-  # #   print(tokenList[i])
-  # #   # print(token.lineList[i])  
-  # #   i+=1
-
-  # for i in range(len(tokenList)):
-  #   print(tokenList[i].kind, tokenList[i].value, tokenList[i].lineNum)
-
-  # # print(tokenList.kind)
+  return programList
+# lex(listFile)
