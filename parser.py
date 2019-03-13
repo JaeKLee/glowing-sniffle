@@ -2,7 +2,9 @@ import lex
 import regex
 import tree
 
+# This will traverse through each row of the 2D
 rowToken = 0
+# This will traverse through each value in the row
 columnToken = 0
 errorCounter = 0
 programNumber = 1
@@ -19,9 +21,10 @@ open_file.close()
 tokenList = lex.lex(listFile)
 
 print("\nPARSER")
-for i in tokenList:
-  for j in i:
-    print(j.kind)
+# Testing purpose
+# for i in tokenList:
+#   for j in i:
+#     print(j.kind)
 
 def match(expectedToken):
   global rowToken, columnToken
@@ -118,6 +121,8 @@ def parseIntExpr():
 def parseStatement():
   global rowToken, columnToken
   notVal = False
+  # If print("parseStatement()") is not in individual
+  # statements, it will print out countless parseStatement()
   if match("T_PRINT") is True:
     print("parseStatement()")
     notVal = True
@@ -142,8 +147,7 @@ def parseStatement():
     print("parseStatement()")
     notVal = True
     parseBlock()
-  else:#if notVal is False:
-    # printErrorStmt(tokenList[rowToken][columnToken].kind)
+  else: # It will do nothing because statementList allows epsilon
     notVal = False
   return notVal
   
@@ -154,20 +158,13 @@ def parseStatementList():
     parseStatementList()
   elif match("T_RBRACE") is True:
     printValidStmt("T_RBRACE")
-  # if match("T_EOP") is True:
-  #   parseProgram()
-  #   printValidStmt("T_EOP")
-  # else:
-  #   parseStatement()
-  #   parseStatementList()
 
 def parseBlock():
-  print("parseBlock()")
   if match("T_LBRACE") is True:
     printValidStmt("T_LBRACE")
+    print("parseBlock()")
     if parseStatement() is True:
       parseStatementList()
-  # elif match("T_RBRACE") is True: 
   if match("T_RBRACE") is True:
     printValidStmt("T_RBRACE in block")
 
@@ -234,8 +231,11 @@ def parseProgram():
     if match("T_EOP") is True:
       printValidStmt("T_EOP")
       programNumber+=1
+      # Once it reaches EOP, move to the next row of the 2D array
       rowToken+=1
+      # Set columnToken to zero to start from the beginning of the row
       columnToken=0
+      # To avoid out of range
       if rowToken < len(tokenList):
         parse()
 
@@ -243,9 +243,12 @@ def parse():
   global programNumber, rowToken, columnToken
   print("\nProgram " , programNumber , " starting....")
   if match("ERROR") is True:
-    print("Parser: Skipped due to Lexer error(s)\n")
-    rowToken = len(tokenList)
-    columnToken = len(tokenList)
+    print("Parser: Skipped due to Lexer error(s)")
+    if rowToken < len(tokenList):
+      rowToken+=1
+      programNumber+=1
+      columnToken=0
+      parse()
   else:
     parseProgram()
 
