@@ -10,7 +10,8 @@ errorCounter = 0
 programNumber = 1
 # cst = tree.Tree()
 
-x = str(input("What are you looking for? "))
+# For dynamic test inputs
+x = str(input("Enter the test file: "))
 
 # Opening as read mode to read the test files
 open_file = open(x, "r")
