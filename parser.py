@@ -10,8 +10,10 @@ errorCounter = 0
 programNumber = 1
 # cst = tree.Tree()
 
+x = str(input("What are you looking for? "))
+
 # Opening as read mode to read the test files
-open_file = open("test_alan.txt", "r")
+open_file = open(x, "r")
 # Creating list of individual contents in the file
 listFile = list(open_file.read())
 # Close file
