@@ -242,7 +242,7 @@ def parseProgram():
       if rowToken < len(tokenList):
         parse()
 
-def parse():
+def parse(tokenList):
   global programNumber, rowToken, columnToken
   print("\nProgram " , programNumber , " starting....")
   if match("ERROR") is True:
@@ -255,4 +255,4 @@ def parse():
   else:
     parseProgram()
 
-parse()
+# parse()

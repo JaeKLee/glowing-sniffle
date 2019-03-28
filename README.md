@@ -6,4 +6,4 @@ How to open/run the compilers:
   - [ ] Open the file through command prompt:
     - [ ] e.g. "C:\Users\John.Smith\Documents\Marist\Spring 2019\glowing-sniffle"
   - [ ] Run filename.py
-
+  - [ ] Enter the name of your test file precisely at the prompt of "Enter the test file:"
