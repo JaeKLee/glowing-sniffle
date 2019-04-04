@@ -24,4 +24,4 @@ def letsDrive():
   # Create list of tokens from the LEX output
   # It should be 2D list
   tokenList = lex.lex(listFile)
-  parser.parse(tokenList)
+  parser.startParse()

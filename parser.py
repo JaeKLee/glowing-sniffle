@@ -23,7 +23,9 @@ open_file.close()
 # Create list of tokens from the LEX output
 # It should be 2D list
 tokenList = lex.lex(listFile)
-
+# for i in range(len(tokenList)):
+#   for j in range(len(tokenList[i])):
+#     print(tokenList[i][j].value)
 print("\nPARSER")
 # Testing purpose
 # for i in tokenList:
@@ -75,15 +77,18 @@ def parseCharList():
 
 def parseID():
   printValidStmt("T_ID parseID")
-  parseChar()
+  print(tokenList[rowToken][columnToken].value)
+  # parseChar()
+  if tokenList[rowToken][columnToken].value == "=":
+    parseAssignment()
 
 def parseExpr():
   print("parseExpr()")
-  if match("T_DIGIT"):
+  if match("T_DIGIT") is True:
     parseIntExpr()
-  elif match("T_QUOTE"):
+  elif match("T_QUOTE") is True:
     parseStringExpr() 
-  elif match("T_RPAREN"):
+  elif match("T_RPAREN") is True:
     parseBooleanExpr()
   else:
     parseID()
@@ -192,7 +197,7 @@ def parseWhile():
 
 def parseVarDecl():
   print("parseVarDecl()")
-  if match("T_TYPE"):
+  if match("T_TYPE") is True:
     printValidStmt("T_TYPE")
     parseID()
   else:
@@ -200,13 +205,15 @@ def parseVarDecl():
 
 def parseAssignment():
   print("parseAssignment()")
-  if match("T_ID") is True:
-    parseID()
-    if match("T_ASSIGN") is True: 
+  if match("T_ID") is True or match("T_ASSIGN") is True:
+    # parseID()
+    if match("T_ID") is True:
+      parseID()
+    elif match("T_ASSIGN") is True: 
       printValidStmt("T_ASSIGN")
       parseExpr()
   else:
-    printErrorStmt("parseAssignment is wrong")
+    printErrorStmt("parseAssignment")
 
 def parsePrint():
   print("parsePrint()")
@@ -242,7 +249,7 @@ def parseProgram():
       if rowToken < len(tokenList):
         parse()
 
-def parse(tokenList):
+def parse():
   global programNumber, rowToken, columnToken
   print("\nProgram " , programNumber , " starting....")
   if match("ERROR") is True:
@@ -255,4 +262,6 @@ def parse(tokenList):
   else:
     parseProgram()
 
-# parse()
+# def startParse():
+#   parse(tokenList)
+parse()

@@ -4,13 +4,20 @@ import re
 # Please ensure that you have downloaded regex.py as well
 import regex
 import token
+import parser
+
+# For dynamic test inputs
+# x = str(input("Enter the test file: "))
 
 # # Opening as read mode to read the test files
-# open_file = open("test_alan.txt", "r")
+# open_file = open(x, "r")
 # # Creating list of individual contents in the file
 # listFile = list(open_file.read())
 # # Close file
 # open_file.close()
+
+# Create list of tokens from the LEX output
+# It should be 2D list
 
 def lex(listFile):
   # Variables
@@ -220,7 +227,6 @@ def lex(listFile):
           programNumber+=1
           running = not running # This should equal false 
           programList.append(tokenList) # To separate tokens into different programs
-
           # for row in programList:
           #   # print(row.value)
           #   for column in row:
