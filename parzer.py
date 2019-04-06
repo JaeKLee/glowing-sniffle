@@ -23,6 +23,7 @@ open_file.close()
 # Create list of tokens from the LEX output
 # It should be 2D list
 tokenList = lex.lex(listFile)
+
 # for i in range(len(tokenList)):
 #   for j in range(len(tokenList[i])):
 #     print(tokenList[i][j].value)
