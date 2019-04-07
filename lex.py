@@ -233,6 +233,7 @@ def lex(listFile):
           #     print(column.value)
 
           errorCounter=0
+          # parzer.parse(listFile)
         else:
           errorCounter+=1
           errorCheck = not errorCheck
@@ -246,7 +247,7 @@ def lex(listFile):
         tokenList = []
         createToken("ERROR", "ERROR", lineNumber)
         programList.append(tokenList)
-        tokenList = []
+        # tokenList = []
         # for i in programList:
         #   for j in i:
         #     print(j.kind, j.value, j.lineNum)
