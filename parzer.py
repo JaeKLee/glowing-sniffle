@@ -9,7 +9,7 @@ rowToken = 0
 columnToken = 0
 errorCounter = 0
 programNumber = 1
-# cst = tree.Tree()
+cst = tree.Tree()
 
 # # For dynamic test inputs
 # x = str(input("Enter the test file: "))
@@ -174,6 +174,7 @@ def parseBlock(tokenList):
   if match(tokenList, "T_LBRACE") is True:
     printValidStmt(tokenList, "T_LBRACE")
     print("parseBlock()")
+    # cst.addNode()
     if parseStatement(tokenList) is True:
       parseStatementList(tokenList)
   if match(tokenList, "T_RBRACE") is True:
@@ -236,7 +237,7 @@ def parsePrint(tokenList):
 def parseProgram(tokenList):
   global programNumber, rowToken, columnToken
   print("parseProgram()")
-  # cst.addNode("Program", "branch", "")
+  cst.addNode("Program", "branch", "", None)
   if rowToken < len(tokenList):
     if match(tokenList, "T_LBRACE") is True:
       parseBlock(tokenList)
