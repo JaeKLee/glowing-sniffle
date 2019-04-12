@@ -17,17 +17,26 @@ listFile = list(open_file.read())
 open_file.close()
 # import parser
 def letsDrive():
+  import re
   import lex
   import parzer
   import regex
   # Create list of tokens from the LEX output
   # It should be 2D list
   tokenList = lex.lex(listFile)
-  for i in tokenList:
-    for j in i:
-      print(j.kind)
-  print("\nPARSER")
+  # for i in tokenList:
+  #   for j in i:
+  #     # print(j.kind)
+  #     if re.search(regex.eop, j.value):
+  #       print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
+  #       parzer.parse(tokenList)
+  #     else:
+  #       print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
+  # print("\nPARSER")
 
+  # parzer.parse(tokenList)
+
+  # lex.printLex(tokenList)
   parzer.parse(tokenList)
 
   # if tokenList[rowToken][columnToken].kind == regex.eop:

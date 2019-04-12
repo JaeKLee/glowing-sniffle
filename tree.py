@@ -1,26 +1,18 @@
-#-----------------------------------------
-# tree.py
-#
-# By Alan G. Labouseur, based on the 2009
-# work by Michael Ardizzone and Tim Smith.
-# Edited by Jae Kyoung Lee (LJ)
-#-----------------------------------------
 class Node:
-  def __init__(self, inputName, inputChildren, inputParent):
+  def __init__(self, inputName):
     self.name = inputName
-    self.children = [inputChildren]
-    self.parent = [inputParent]
+    self.children = []
+    self.parent = None
+traversalResult = ""
 
-class Tree:
+class Tree: 
   def __init__(self):
     # return super().__init__(*args, **kwargs)
     self.root = None
-    self.cur = []
+    self.cur = None # Node object
 
-  def addNode(self, name, kind, childrenNode, parentNode):
-    node = Node(name, childrenNode, parentNode)
-    nodeList = []
-    nodeList.append(node)
+  def addNodeDef(self, name, kind):
+    node = Node(name)
     if (self.root is None) or not self.root:
       self.root = node
     else:
@@ -28,29 +20,32 @@ class Tree:
       self.cur.children.append(node)
     if kind == "branch":
       self.cur = node
+  # addNode = lambda x,y: addNodeDef(x, y)
 
   def endChildren(self):
-    if self.cur.parent is not None and self.cur.parent.name is not None:
+    if (self.cur.parent is not None) and (self.cur.parent.name is not None):
       self.cur = self.cur.parent
     else:
       print("error in tree")
-
+  
   def toString(self):
+    # global traversalResult
     traversalResult = ""
     def expand(node, depth):
+      global traversalResult # infinite loop
       i = 0
-      for i in depth:
+      while i < depth:
         traversalResult+="-"
         i+=1
-      if not node.children or node.children.length == 0:
-        traversalResult += "[" , node.name , "]"
+      # print(type(traversalResult) is tuple)
+      if not node.children or len(node.children) == 0:
+        traversalResult += "[" + node.name + "]"
         traversalResult += "\n"
       else:
-        traversalResult += "<" , node.name , "> \n"
+        traversalResult += "<" + node.name + "> \n"
         i = 0
         while i < len(node.children):
           expand(node.children[i], depth + 1)
+          return traversalResult
     expand(self.root, 0)
     return traversalResult
-
-

@@ -10,6 +10,8 @@ columnToken = 0
 errorCounter = 0
 programNumber = 1
 cst = tree.Tree()
+print(cst)
+cst.addNodeDef("Root", "branch")
 
 # # For dynamic test inputs
 # x = str(input("Enter the test file: "))
@@ -130,6 +132,7 @@ def parseIntExpr(tokenList):
     printErrorStmt(tokenList, "T_DIGIT")
 
 def parseStatement(tokenList):
+  cst.addNodeDef("Statement", "branch")
   global rowToken, columnToken
   notVal = False
   # If print("parseStatement()") is not in individual
@@ -160,14 +163,17 @@ def parseStatement(tokenList):
     parseBlock(tokenList)
   else: # It will do nothing because statementList allows epsilon
     notVal = False
+  cst.endChildren()
   return notVal
   
 def parseStatementList(tokenList):
+  cst.addNodeDef("StatementList", "branch")
   if parseStatement(tokenList) is True:
     print("parseStatementList()")
     parseStatement(tokenList)
     parseStatementList(tokenList)
-  elif match(tokenList, "T_RBRACE") is True:
+  cst.endChildren()
+  if match(tokenList, "T_RBRACE") is True:
     printValidStmt(tokenList, "T_RBRACE")
 
 def parseBlock(tokenList):
@@ -237,7 +243,10 @@ def parsePrint(tokenList):
 def parseProgram(tokenList):
   global programNumber, rowToken, columnToken
   print("parseProgram()")
-  cst.addNode("Program", "branch", "", None)
+  cst.addNodeDef("Program", "branch")
+  # for c in cst:
+  cst.endChildren()
+  print(cst.toString(), "trying to print cst")
   if rowToken < len(tokenList):
     if match(tokenList, "T_LBRACE") is True:
       parseBlock(tokenList)
@@ -248,7 +257,9 @@ def parseProgram(tokenList):
       rowToken+=1
       # Set columnToken to zero to start from the beginning of the row
       columnToken=0
+      # driver.letsDrive()
       # To avoid out of range
+      printParzer()
       if rowToken < len(tokenList):
         parse(tokenList)
 
@@ -268,3 +279,10 @@ def parse(tokenList):
 # def startParse():
 #   parse(tokenList)
 # parse()
+
+def printParzer():
+  import driver
+  # print("test")
+  driver.letsDrive()
+
+print(cst)

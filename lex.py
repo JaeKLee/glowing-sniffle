@@ -48,7 +48,7 @@ def lex(listFile):
     if errorCheck:
       # if re.search(r"[^\s]", listFile[indexCounter]):
       if re.search(regex.leftBrace, listFile[indexCounter]):
-        # print("Program " , programNumber , " starting....")
+        print("Program " , programNumber , " starting....")
         tokenList = [] # Reset for new program
         running=not running # This should equal to True
       # This while will actually go through the list and do the lexing
@@ -282,3 +282,14 @@ def lex(listFile):
 
   return programList
 # lex(listFile)
+
+def printLex(tokenList):
+  import parzer
+  for i in tokenList:
+    for j in i:
+      # print(j.kind)
+      if re.search(regex.eop, j.value):
+        print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
+        parzer.parse(tokenList)
+      else:
+        print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
