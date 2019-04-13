@@ -21,6 +21,7 @@ def letsDrive():
   import lex
   import parzer
   import regex
+  import printstmt
   # Create list of tokens from the LEX output
   # It should be 2D list
   tokenList = lex.lex(listFile)
@@ -37,7 +38,16 @@ def letsDrive():
   # parzer.parse(tokenList)
 
   # lex.printLex(tokenList)
+  # for i in lex.lexstmt:
+  # print(lex.printstmt)
   parzer.parse(tokenList)
+  for i in printstmt.outerStmt:
+    # print(i)
+    for j in i:
+      # print(lex.lexstmt)
+      print(j)
+  # print(tokenList)
+  # parzer.parse(tokenList)
 
   # if tokenList[rowToken][columnToken].kind == regex.eop:
   #   parzer.parse(tokenList)
