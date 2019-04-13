@@ -1,0 +1,24 @@
+                |
+    Token       |   Token Name
+----------------------------------------
+      {         | T_LBRACE
+      }         | T_RBRACE
+      (         | T_LPAREN
+      )         | T_RPAREN
+      if        | T_IF
+      ID        | T_ID
+      while     | T_WHILE
+      print     | T_PRINT
+      int       | T_TYPE
+      boolean   | T_TYPE
+      string    | T_TYPE
+      false     | T_BOOLVAL
+      true      | T_BOOLVAL
+      "         | T_QUOTE
+      char      | T_CHAR
+      !=        | T_BOOLOP
+      ==        | T_BOOLOP
+      =         | T_ASSIGN
+      0-9       | T_DIGIT
+      +         | T_OP
+      $         | T_EOP
