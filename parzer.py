@@ -1,7 +1,6 @@
 import lex
 import regex
 import tree
-# import driver
 import printstmt
 
 # This will traverse through each row of the 2D
@@ -52,7 +51,8 @@ def match(tokenList, expectedToken):
   return notVal
   
 def printErrorStmt(tokenList, expectedToken):
-  global rowToken, columnToken
+  global rowToken, columnToken, errorCounter
+  errorCounter+=1
   print("Failed - Expected ", expectedToken,  " but found " ,  tokenList[rowToken][columnToken].kind , " with value '" ,  tokenList[rowToken][columnToken].value , "' on line " ,  tokenList[rowToken][columnToken].lineNum)
   # For errors, we skip to the end of the index, so parser doesn't continue
   while columnToken+1 < len(tokenList) and tokenList[rowToken][columnToken].value != "$":
@@ -72,10 +72,12 @@ def consumeToken(tokenList):
     columnToken+=1
 
 def parseBoolOp(tokenList):
-  global rowToken
+  global rowToken, columnToken
+  cst.addNodeDef("BoolOP", "branch")
   printstmt.outerStmt[rowToken].append("parseBoolOp()") 
   if match(tokenList, "T_BOOLOP") is True:
     printValidStmt(tokenList, "T_BOOLOP")
+    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
   else:
     printErrorStmt(tokenList, "T_BOOLOP")
@@ -208,6 +210,7 @@ def parseStatementList(tokenList):
     consumeToken(tokenList)
 
 def parseBlock(tokenList):
+  cst.addNodeDef("Block", "branch")
   if match(tokenList, "T_LBRACE") is True:
     printValidStmt(tokenList, "T_LBRACE")
     consumeToken(tokenList)
@@ -215,12 +218,14 @@ def parseBlock(tokenList):
     # cst.addNode()
     if parseStatement(tokenList) is True:
       parseStatementList(tokenList)
+  cst.endChildren()
   if match(tokenList, "T_RBRACE") is True:
     printValidStmt(tokenList, "T_RBRACE")
     consumeToken(tokenList)
 
 def parseIf(tokenList):
   global rowToken
+  cst.addNodeDef("IF", "branch")
   printstmt.outerStmt[rowToken].append("parseIf()")
   if match(tokenList, "T_IF") is True:
     printValidStmt(tokenList, "T_IF")
@@ -229,9 +234,11 @@ def parseIf(tokenList):
     parseBlock(tokenList)
   else:
     printErrorStmt(tokenList, "T_IF")
+  cst.endChildren()
 
 def parseWhile(tokenList):
   global rowToken
+  cst.addNodeDef("WHILE", "branch")
   printstmt.outerStmt[rowToken].append("parseWhile()")  
   if match(tokenList, "T_WHILE") is True:
     printValidStmt(tokenList, "T_WHILE")
@@ -240,9 +247,11 @@ def parseWhile(tokenList):
     parseBlock(tokenList)
   else:
     printErrorStmt(tokenList, "T_WHILE")
+  cst.endChildren()
 
 def parseVarDecl(tokenList):
   global rowToken
+  cst.addNodeDef("VarDecl", "branch")
   printstmt.outerStmt[rowToken].append("parseVarDecl()")
   if match(tokenList, "T_TYPE") is True:
     printValidStmt(tokenList, "T_TYPE")
@@ -250,9 +259,11 @@ def parseVarDecl(tokenList):
     parseID(tokenList)
   else:
     printErrorStmt(tokenList, "VARDECL")
+  cst.endChildren()
 
 def parseAssignment(tokenList):
   global rowToken
+  cst.addNodeDef("Assignment", "branch")
   printstmt.outerStmt[rowToken].append("parseAssignment()")
   if match(tokenList, "T_ID") is True or match(tokenList, "T_ASSIGN") is True:
     # parseID()
@@ -264,9 +275,11 @@ def parseAssignment(tokenList):
       parseExpr(tokenList)
   else:
     printErrorStmt(tokenList, "parseAssignment")
+  cst.endChildren()
 
 def parsePrint(tokenList):
   global rowToken
+  cst.addNodeDef("PRINT", "branch")
   printstmt.outerStmt[rowToken].append("parsePrint()")
   if match(tokenList, "T_PRINT") is True:
     printValidStmt(tokenList, "T_PRINT")
@@ -284,11 +297,11 @@ def parsePrint(tokenList):
       printErrorStmt(tokenList, "T_RPAREN")
   else:
     printErrorStmt(tokenList, "T_PRINT")
+  cst.endChildren()
 
 def parseProgram(tokenList):
   global programNumber, rowToken, columnToken
   # print(type(printstmt.outerStmt[rowToken]))
-  printstmt.outerStmt[rowToken].append("\nPARSER")
   printstmt.outerStmt[rowToken].append("parseProgram()")
   cst.addNodeDef("Program", "branch")
   # for c in cst:
@@ -313,6 +326,18 @@ def parseProgram(tokenList):
 
 def parse(tokenList):
   global programNumber, rowToken, columnToken
+  for i in tokenList:
+    # print(i)
+    for j in i:
+      # print(lex.lexstmt)
+      print(j.kind)
+  # for i in printstmt.outerStmt:
+  #   # print(i)
+  #   for j in i:
+  #     # print(lex.lexstmt)
+  #     print(j)
+  print(rowToken, columnToken)
+  printstmt.outerStmt[rowToken].append("\nPARSER")
   # printstmt.outerStmt[rowToken].append("\nProgram " , programNumber , " starting....")
   if match(tokenList, "ERROR") is True:
     printstmt.outerStmt[rowToken].append("Parser: Skipped due to Lexer error(s)")
@@ -321,17 +346,8 @@ def parse(tokenList):
       programNumber+=1
       columnToken=0
       parse(tokenList)
-      lex.printLex(tokenList)
+      # lex.printLex(tokenList)
   else:
     parseProgram(tokenList)
 
-# def startParse():
-#   parse(tokenList)
-# parse()
-
-def printParzer():
-  import driver
-  # print("test")
-  driver.letsDrive()
-
-print(cst)
+# print(cst)

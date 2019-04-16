@@ -17,11 +17,12 @@ listFile = list(open_file.read())
 open_file.close()
 # import parser
 def letsDrive():
-  import re
+  # import re
   import lex
   import parzer
-  import regex
+  # import regex
   import printstmt
+  import semanticAnalysis
   # Create list of tokens from the LEX output
   # It should be 2D list
   tokenList = lex.lex(listFile)
@@ -41,6 +42,7 @@ def letsDrive():
   # for i in lex.lexstmt:
   # print(lex.printstmt)
   parzer.parse(tokenList)
+  semanticAnalysis.semanticAnalysis(tokenList)
   for i in printstmt.outerStmt:
     # print(i)
     for j in i:

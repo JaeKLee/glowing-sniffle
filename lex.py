@@ -284,6 +284,7 @@ def lex(listFile):
         tokenList = []
         createToken("ERROR", "ERROR", lineNumber)
         programList.append(tokenList)
+        printstmt.outerStmt.append(printstmt.innerStmt) # Making a 2D array of print statements
         # tokenList = []
         # for i in programList:
         #   for j in i:
@@ -315,19 +316,8 @@ def lex(listFile):
       # print("\nEOP is not found at the end of last program. Adding EOP at ", lineNumber)
       warningCounter+=1
   if warningCounter > 0:
-    print("Found " , warningCounter , " warning(s) in LEXER")
+    printstmt.innerStmt.append("Found " , warningCounter , " warning(s) in LEXER")
 
   
   return programList
 # lex(listFile)
-
-def printLex(tokenList):
-  import parzer
-  for i in tokenList:
-    for j in i:
-      # print(j.kind)
-      if re.search(regex.eop, j.value):
-        print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
-        parzer.parse(tokenList)
-      else:
-        print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
