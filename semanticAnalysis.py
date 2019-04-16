@@ -1,4 +1,3 @@
-import parzer
 import printstmt
 
 # This will traverse through each row of the 2D
@@ -22,8 +21,8 @@ def semanticAnalysis(tokenList):
     printstmt.outerStmt[rowToken].append("\nSemantic Analysis")
     # printstmt.outerStmt[rowToken].append("\nProgram " , programNumber , " starting....")
     if match(tokenList, "ERROR") is True:
-        printstmt.outerStmt[rowToken].append("Semantic Analysis: Skipped due to Parser error(s)")
-        if rowToken < len(tokenList):
-            rowToken+=1 # Moving onto next program
-            # programNumber+=1
-            columnToken=0
+      printstmt.outerStmt[rowToken].append("Semantic Analysis: Skipped due to Parser error(s)")
+      if rowToken < len(tokenList):
+          rowToken+=1 # Moving onto next program
+          # programNumber+=1
+          columnToken=0

@@ -1,10 +1,4 @@
-# This will traverse through each row of the 2D
-rowToken = 0
-# This will traverse through each value in the row
-columnToken = 0
-errorCounter = 0
-programNumber = 1
-# cst = tree.Tree()
+# Jae Kyoung Lee
 
 # For dynamic test inputs
 x = str(input("Enter the test file: "))
@@ -17,42 +11,31 @@ listFile = list(open_file.read())
 open_file.close()
 # import parser
 def letsDrive():
-  # import re
   import lex
   import parzer
-  # import regex
   import printstmt
   import semanticAnalysis
+
   # Create list of tokens from the LEX output
   # It should be 2D list
   tokenList = lex.lex(listFile)
-  # for i in tokenList:
-  #   for j in i:
-  #     # print(j.kind)
-  #     if re.search(regex.eop, j.value):
-  #       print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
-  #       parzer.parse(tokenList)
-  #     else:
-  #       print("Found token", j.kind , ": " , j.value , " in line ", j.lineNum)
-  # print("\nPARSER")
 
-  # parzer.parse(tokenList)
-
-  # lex.printLex(tokenList)
-  # for i in lex.lexstmt:
-  # print(lex.printstmt)
   parzer.parse(tokenList)
   semanticAnalysis.semanticAnalysis(tokenList)
+
+
+  # Checking for debugging
+  # for i in tokenList:
+  #   # print(i)
+  #   for j in i:
+  #     # print(lex.lexstmt)
+  #     print(j.kind)
+
+  # Traverses the list of print statements
   for i in printstmt.outerStmt:
     # print(i)
     for j in i:
-      # print(lex.lexstmt)
+      # Prints out statements
       print(j)
-  # print(tokenList)
-  # parzer.parse(tokenList)
-
-  # if tokenList[rowToken][columnToken].kind == regex.eop:
-  #   parzer.parse(tokenList)
-
 
 letsDrive()

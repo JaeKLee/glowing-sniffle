@@ -7,7 +7,6 @@ traversalResult = ""
 
 class Tree: 
   def __init__(self):
-    # return super().__init__(*args, **kwargs)
     self.root = None
     self.cur = None # Node object
 
@@ -27,7 +26,7 @@ class Tree:
       self.cur = self.cur.parent
     else:
       print("error in tree")
-  
+
   def toString(self):
     # global traversalResult
     traversalResult = ""
@@ -38,6 +37,7 @@ class Tree:
         traversalResult+="-"
         i+=1
       # print(type(traversalResult) is tuple)
+      # if not node.children or len(node.children) == 0:
       if not node.children or len(node.children) == 0:
         traversalResult += "[" + node.name + "]"
         traversalResult += "\n"
@@ -46,6 +46,7 @@ class Tree:
         i = 0
         while i < len(node.children):
           expand(node.children[i], depth + 1)
+          i+=1
           return traversalResult
     expand(self.root, 0)
     return traversalResult
