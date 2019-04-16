@@ -1,3 +1,4 @@
+import printstmt
 class Node:
   def __init__(self, inputName):
     self.name = inputName
@@ -29,7 +30,7 @@ class Tree:
 
   def toString(self):
     # global traversalResult
-    traversalResult = ""
+    # traversalResult = ""
     def expand(node, depth):
       global traversalResult # infinite loop
       i = 0
@@ -46,7 +47,9 @@ class Tree:
         i = 0
         while i < len(node.children):
           expand(node.children[i], depth + 1)
+          # print(node.children[i])
           i+=1
           return traversalResult
     expand(self.root, 0)
     return traversalResult
+  # print(traversalResult)

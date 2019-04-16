@@ -1,5 +1,3 @@
-import lex
-import regex
 import tree
 import printstmt
 
@@ -10,32 +8,6 @@ columnToken = 0
 errorCounter = 0
 cst = tree.Tree()
 # print(cst)
-parserToken = []
-
-
-
-# # For dynamic test inputs
-# x = str(input("Enter the test file: "))
-
-# # Opening as read mode to read the test files
-# open_file = open(x, "r")
-# # Creating list of individual contents in the file
-# listFile = list(open_file.read())
-# # Close file
-# open_file.close()
-
-# # Create list of tokens from the LEX output
-# # It should be 2D list
-# tokenList = driver.tokenList
-
-# for i in range(len(tokenList)):
-#   for j in range(len(tokenList[i])):
-#     print(tokenList[i][j].value)
-# print("\nPARSER")
-# Testing purpose
-# for i in tokenList:
-#   for j in i:
-#     print(j.kind)
   
 def match(tokenList, expectedToken):
   global rowToken, columnToken
@@ -224,6 +196,7 @@ def parseStatementList(tokenList):
 def parseBlock(tokenList):
   cst.addNodeDef("Block", "branch")
   if match(tokenList, "T_LBRACE") is True:
+    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     printValidStmt(tokenList, "T_LBRACE")
     consumeToken(tokenList)
     printstmt.outerStmt[rowToken].append("parseBlock()")
@@ -232,6 +205,7 @@ def parseBlock(tokenList):
       parseStatementList(tokenList)
   cst.endChildren()
   if match(tokenList, "T_RBRACE") is True:
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     printValidStmt(tokenList, "T_RBRACE")
     consumeToken(tokenList)
 
@@ -313,16 +287,16 @@ def parsePrint(tokenList):
 
 def parseProgram(tokenList):
   global rowToken, columnToken
-  # print(type(printstmt.outerStmt[rowToken]))
   printstmt.outerStmt[rowToken].append("parseProgram()")
   cst.addNodeDef("Program", "branch")
-  # for c in cst:
-  cst.endChildren()
+  # cst.endChildren()
   # print(cst.toString() + "trying to print cst")
   if rowToken < len(tokenList):
     if match(tokenList, "T_LBRACE") is True:
       parseBlock(tokenList)
     if match(tokenList, "T_EOP") is True:
+      cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+      # cst.endChildren()
       printValidStmt(tokenList, "T_EOP")
       consumeToken(tokenList)
       printstmt.outerStmt[rowToken].append("\nCST")
@@ -336,6 +310,7 @@ def parseProgram(tokenList):
       # printParzer()
       if rowToken < len(tokenList):
         parse(tokenList)
+  cst.endChildren()
 
 def parse(tokenList):
   global rowToken, columnToken
@@ -348,7 +323,6 @@ def parse(tokenList):
       rowToken+=1 # Moving onto next program
       columnToken=0
       parse(tokenList)
-      # lex.printLex(tokenList)
   else:
     cst.addNodeDef("Root", "branch")
     parseProgram(tokenList)
