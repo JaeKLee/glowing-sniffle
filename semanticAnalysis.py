@@ -1,4 +1,5 @@
 import printstmt
+import tree
 
 # This will traverse through each row of the 2D
 rowToken = 0
@@ -6,6 +7,7 @@ rowToken = 0
 columnToken = 0
 errorCounter = 0
 # print("test")
+ast = tree.Tree()
 
 def match(tokenList, expectedToken):
   global rowToken, columnToken
@@ -26,3 +28,5 @@ def semanticAnalysis(tokenList):
           rowToken+=1 # Moving onto next program
           # programNumber+=1
           columnToken=0
+    else:
+      printstmt.outerStmt[rowToken].append("Semantic Analysis... Commence!")

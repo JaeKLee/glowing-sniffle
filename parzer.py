@@ -180,34 +180,47 @@ def parseStatement(tokenList):
   else: # It will do nothing because statementList allows epsilon
     notVal = False
   cst.endChildren()
-  return notVal
+  # return notVal
   
 def parseStatementList(tokenList):
   cst.addNodeDef("StatementList", "branch")
-  if parseStatement(tokenList) is True:
+  # if parseStatement(tokenList) is True:
+  if match(tokenList, "T_PRINT") is True or match(tokenList, "T_ID") is True or match(tokenList, "T_TYPE") is True or match(tokenList, "T_WHILE") is True or match(tokenList, "T_IF") is True or match(tokenList, "T_LBRACE") is True:
     printstmt.outerStmt[rowToken].append("parseStatementList()")
     parseStatement(tokenList)
     parseStatementList(tokenList)
   cst.endChildren()
-  if match(tokenList, "T_RBRACE") is True:
-    printValidStmt(tokenList, "T_RBRACE")
-    consumeToken(tokenList)
+  # if parseStatement(tokenList) is True:
+  if match(tokenList, "T_PRINT") is True or match(tokenList, "T_ID") is True or match(tokenList, "T_TYPE") is True or match(tokenList, "T_WHILE") is True or match(tokenList, "T_IF") is True or match(tokenList, "T_LBRACE") is True:
+    printstmt.outerStmt[rowToken].append("parseStatementList()")
+    parseStatement(tokenList)
+    parseStatementList(tokenList)
+  else:
+    printstmt.outerStmt[rowToken].append("Lambda")
+  # if match(tokenList, "T_RBRACE") is True:
+  #   printValidStmt(tokenList, "T_RBRACE")
+  #   consumeToken(tokenList)
 
 def parseBlock(tokenList):
   cst.addNodeDef("Block", "branch")
   if match(tokenList, "T_LBRACE") is True:
     cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    printstmt.outerStmt[rowToken].append("parseBlock()")
     printValidStmt(tokenList, "T_LBRACE")
     consumeToken(tokenList)
-    printstmt.outerStmt[rowToken].append("parseBlock()")
-    # cst.addNode()
-    if parseStatement(tokenList) is True:
-      parseStatementList(tokenList)
-  cst.endChildren()
+  else:
+    printErrorStmt(tokenList, "T_LBRACE")
+  # if match(tokenList, "T_PRINT") is True or match(tokenList, "T_ID") is True or match(tokenList, "T_TYPE") is True or match(tokenList, "T_WHILE") is True or match(tokenList, "T_IF") is True or match(tokenList, "T_LBRACE") is True:
+    # if parseStatement(tokenList) is True:
+  # cst.endChildren()
+  parseStatementList(tokenList)
   if match(tokenList, "T_RBRACE") is True:
-    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     printValidStmt(tokenList, "T_RBRACE")
     consumeToken(tokenList)
+  else:
+    printErrorStmt(tokenList, "T_RBRACE")
+  cst.endChildren()
 
 def parseIf(tokenList):
   global rowToken

@@ -4,6 +4,7 @@ class Node:
     self.name = inputName
     self.children = []
     self.parent = None
+
 traversalResult = ""
 
 class Tree: 
@@ -20,10 +21,12 @@ class Tree:
       self.cur.children.append(node)
     if kind == "branch":
       self.cur = node
-  # addNode = lambda x,y: addNodeDef(x, y)
 
+  # Note that we're done with this branch of the tree...
   def endChildren(self):
-    if (self.cur.parent is not None) and (self.cur.parent.name is not None):
+    # ... by moving "up" to our parent node (if possible).
+    # if self.cur.parent is not None and self.cur.parent.name is not None:
+    if self.cur.parent is not None and self.cur.parent.name is not None:
       self.cur = self.cur.parent
     else:
       print("error in tree")
@@ -33,6 +36,7 @@ class Tree:
     # traversalResult = ""
     def expand(node, depth):
       global traversalResult # infinite loop
+      # traversalResult = ""
       i = 0
       while i < depth:
         traversalResult+="-"

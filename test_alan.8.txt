@@ -1,0 +1,4 @@
+/* Print Operation */
+{
+	print("there is no spoon")
+}$
