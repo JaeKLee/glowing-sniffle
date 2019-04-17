@@ -4,3 +4,4 @@ class Symbol:
     self.name = name
     self.type = type
     self.category = category
+

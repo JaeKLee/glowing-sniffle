@@ -53,23 +53,27 @@ def parseBoolOp(tokenList):
 def parseChar(tokenList):
   if match(tokenList, "T_CHAR") is True:
     printstmt.outerStmt[rowToken].append("parseChar()")
-    consumeToken(tokenList)
+    printValidStmt(tokenList, "T_CHAR")
     cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
-  cst.endChildren()
+    consumeToken(tokenList)
+  elif tokenList[rowToken][columnToken].value == " ":
+    printstmt.outerStmt[rowToken].append("parseChar()")
+    printValidStmt(tokenList, "T_SPACE")
+    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    consumeToken(tokenList)
+  # cst.endChildren()
 
 def parseCharList(tokenList):
   global rowToken
   cst.addNodeDef("CharList", "branch")
   printstmt.outerStmt[rowToken].append("parseCharList()")
   if match(tokenList, "T_CHAR") is True:
-    printValidStmt(tokenList, "T_CHAR")
-    consumeToken(tokenList)
     parseChar(tokenList)
     parseCharList(tokenList)
   elif tokenList[rowToken][columnToken].value == " ":
-    printValidStmt(tokenList, "T_SPACE")
-    consumeToken(tokenList)
     parseCharList(tokenList)
+  else:
+    printValidStmt(tokenList, "lambda")
   cst.endChildren()
 
 def parseID(tokenList):
@@ -327,7 +331,7 @@ def parseProgram(tokenList):
 
 def parse(tokenList):
   global rowToken, columnToken
-  print(rowToken, columnToken)
+  # print(rowToken, columnToken)
   printstmt.outerStmt[rowToken].append("\nPARSER")
   # printstmt.outerStmt[rowToken].append("\nProgram " , programNumber , " starting....")
   if match(tokenList, "ERROR") is True:

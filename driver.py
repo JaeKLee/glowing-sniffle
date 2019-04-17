@@ -5,6 +5,7 @@ x = str(input("Enter the test file: "))
 
 # Opening as read mode to read the test files
 open_file = open(x, "r")
+# open_file = open("test_alan.8.txt", "r")
 # Creating list of individual contents in the file
 listFile = list(open_file.read())
 # Close file
