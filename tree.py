@@ -1,4 +1,3 @@
-# import printstmt
 
 class Node:
   def __init__(self, inputName):
@@ -6,7 +5,7 @@ class Node:
     self.children = []
     self.parent = None
 
-traversalResult = ""
+traversalResult = ""    
 
 class Tree: 
   def __init__(self):
@@ -37,15 +36,15 @@ class Tree:
     # print(self.cur.parent)
     if self.cur.parent is not None and self.cur.parent.name is not None:
       self.cur = self.cur.parent
-    else:
-      print("error in tree")
+    # else:
+    #   print("error in tree")
 
   def toString(self):
     # global traversalResult
-    # traversalResult = ""
+    traversalResult = "in to string"
     def expand(node, depth):
-      global traversalResult # infinite loop
-      # traversalResult = ""
+      # global traversalResult
+      # traversalResult = "in expand"
       i = 0
       while i < depth:
         traversalResult+="-"
@@ -57,13 +56,14 @@ class Tree:
         traversalResult += "\n"
       else:
         traversalResult += "<" + node.name + "> \n"
-        # j = 0
-      for j in node.children:
-        # expand(node.children[j], depth + 1)
-        expand(j, depth + 1)
-        # print(j.name)
+      # j = 0
+        for children in node.children:
+          # expand(node.children[j], depth + 1)
+          expand(children, depth + 1)
+          # print(j.name)
         # j+=1
-      return traversalResult        
-    expand(self.root, 0)
-    return traversalResult
+        return traversalResult
+    # expand(self.root, 0)
+    # return traversalResult
+    return expand(self.root, 0)
   # print(traversalResult)
