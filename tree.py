@@ -1,4 +1,4 @@
-import printstmt
+# import printstmt
 
 class Node:
   def __init__(self, inputName):
@@ -33,7 +33,7 @@ class Tree:
   def endChildren(self):
     # ... by moving "up" to our parent node (if possible).
     # if self.cur.parent is not None and self.cur.parent.name is not None:
-    print(self.cur.parent.name)
+    # print(self.cur.parent.name)
     # print(self.cur.parent)
     if self.cur.parent is not None and self.cur.parent.name is not None:
       self.cur = self.cur.parent
@@ -58,12 +58,12 @@ class Tree:
       else:
         traversalResult += "<" + node.name + "> \n"
         # j = 0
-        for j in node.children:
-          # expand(node.children[j], depth + 1)
-          expand(j, depth + 1)
-          # print(j.name)
-          # j+=1
-          return traversalResult
+      for j in node.children:
+        # expand(node.children[j], depth + 1)
+        expand(j, depth + 1)
+        # print(j.name)
+        # j+=1
+      return traversalResult        
     expand(self.root, 0)
     return traversalResult
   # print(traversalResult)
