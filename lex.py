@@ -309,7 +309,7 @@ def lex(listFile):
     # To get to the last element that isn't a white space
     while re.search(r"[\s]", listFile[lastIndex]):
       lastIndex-=1
-    if re.search(r"[^\$]", listFile[lastIndex]):
+    if indexCounter < len(listFile) and re.search(r"[^\$]", listFile[lastIndex]):
       listFile.append("$")
       createToken("T_EOP", listFile[indexCounter], lineNumber)
       printstmt.innerStmt.append("\nEOP is not found at the end of last program. Adding EOP at " + str(lineNumber))

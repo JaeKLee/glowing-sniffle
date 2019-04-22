@@ -298,7 +298,7 @@ def parsePrint(tokenList):
   else:
     printErrorStmt(tokenList, "T_PRINT")
   cst.endChildren()
-
+test = []
 def parseProgram(tokenList):
   global rowToken, columnToken, errorCounter
   printstmt.outerStmt[rowToken].append("parseProgram()")
@@ -315,52 +315,46 @@ def parseProgram(tokenList):
     else:
       printErrorStmt(tokenList, "T_RBRACE")
       # consumeToken(tokenList)
-
-
     if errorCounter < 1:
-      printstmt.outerStmt[rowToken].append("test after less errorcounter")
-      # printstmt.outerStmt[rowToken].append(tokenList[rowToken][columnToken].value)
+      test.append(errorCounter)
+      print(errorCounter)
       if match(tokenList, "T_EOP") is True:
         cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
         printValidStmt(tokenList, "T_EOP")
         consumeToken(tokenList)
-        printstmt.outerStmt[rowToken].append("\nCST" + str(errorCounter))
+        printstmt.outerStmt[rowToken].append("\nCST")
         printstmt.outerStmt[rowToken].append(cst.toString())
         rowToken+=1
         columnToken=0
         if rowToken < len(tokenList):
           parse(tokenList)
     elif errorCounter > 0:
-      printstmt.outerStmt[rowToken].append("test after greater errorcounter")
+      test.append(errorCounter)
+      print(errorCounter)
       # parse(tokenList)
       # if errorCounter > 0:
       cst.toString()
-      printstmt.outerStmt[rowToken].append("CZT zkipped cuz Parzer found za error(z)")
-      #   printstmt.outerStmt[rowToken].append("\nCST skipped due to Parser error(s)"+ str(errorCounter))
-      #   # Once it reaches EOP, move to the next row of the 2D array
-      #   rowToken+=1
-      #   # Set columnToken to zero to start from the beginning of the row
-      #   columnToken=0
-      # else:
-      #   printstmt.outerStmt[rowToken].append("\nCST" + str(errorCounter))
-      #   printstmt.outerStmt[rowToken].append(cst.toString())
+      tokenList[rowToken] = []
+      tokenList[rowToken].append("ERROR")
+      # print(tokenList[rowToken])
+      printstmt.outerStmt[rowToken].append("\nCZT zkipped cuz Parzer found za error(z)\n")
       #   # Once it reaches EOP, move to the next row of the 2D array
       rowToken+=1
       #   # Set columnToken to zero to start from the beginning of the row
       columnToken=0
       # To avoid out of range
-      # print(str(rowToken) + " " + str(columnToken) + " in parseprogram")
       if rowToken < len(tokenList):
         # rowToken+=1 # Moving onto next program
         # columnToken=0
         errorCounter=0
         parse(tokenList)
     cst.endChildren()
+    return tokenList
 
 def parse(tokenList):
   global rowToken, columnToken, errorCounter
-  print(str(rowToken) + " " + str(columnToken))
-  printstmt.outerStmt[rowToken].append("\nPARSER" + str(errorCounter))
+  # print(str(rowToken) + " " + str(columnToken))
+  printstmt.outerStmt[rowToken].append("\nPARSER")
   if match(tokenList, "ERROR") is True:
     printstmt.outerStmt[rowToken].append("Parser: Skipped due to Lexer error(s)")
     if rowToken < len(tokenList):

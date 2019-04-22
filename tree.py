@@ -40,11 +40,11 @@ class Tree:
     #   print("error in tree")
 
   def toString(self):
-    # global traversalResult
-    traversalResult = "in to string"
+    global traversalResult
+    traversalResult = ""
     def expand(node, depth):
-      # global traversalResult
-      # traversalResult = "in expand"
+      global traversalResult
+      # traversalResult = ""
       i = 0
       while i < depth:
         traversalResult+="-"
@@ -62,8 +62,10 @@ class Tree:
           expand(children, depth + 1)
           # print(j.name)
         # j+=1
-        return traversalResult
-    # expand(self.root, 0)
-    # return traversalResult
-    return expand(self.root, 0)
+        # return traversalResult
+      node.children=[]
+    
+    expand(self.root, 0)
+    return traversalResult
+    # return expand(self.root, 0)
   # print(traversalResult)
