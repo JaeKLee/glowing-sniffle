@@ -1,5 +1,5 @@
                 |
-    Token       |   Token Name
+Token (Value)   |   Token Name (Kind)
 ----------------------------------------
       {         | T_LBRACE
       }         | T_RBRACE

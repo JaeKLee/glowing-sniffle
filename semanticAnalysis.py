@@ -1,7 +1,7 @@
 import printstmt
 import astTree
 import re
-import symbol
+import symbolTree
 
 # This will traverse through each row of the 2D
 rowToken = 0
@@ -9,24 +9,9 @@ rowToken = 0
 columnToken = 0
 warningCounter = 0
 errorCounter = 0
-scopeLevel = 0
-scope = 0
+scope = -1
 ast = astTree.Tree()
-# symbolTree = treeSymbol.Tree()
-symbolTable = []
-
-class Symbol:
-  def __init__(self, name, typeName=None):
-    self.name = name
-    self.type = typeName
-    self.category = category
-
-def createSymbol(name, typeName):
-  symbols = Symbol(name, typeName)
-  symbolTable.append(symbols)
-
-
-
+scopeTree = symbolTree.Tree()
 
 def match(tokenList, expectedToken):
   global rowToken, columnToken
@@ -42,23 +27,155 @@ def consumeToken(tokenList):
   if rowToken < len(tokenList):
     columnToken+=1
 
+def findVariable(tokenList, node):
+  global rowToken, columnToken
+  notVal = False
+  # if tokenList[rowToken][columnToken].kind == "T_ID":
+  #   printstmt[rowToken][columnToken]
+  if node.parent is None:
+    if match(tokenList, "T_ID") is True:
+      printstmt.outerStmt[rowToken].append("No such variable is detected")
+      notVal = False
+  else:
+    if node.dicto.get(tokenList[rowToken][columnToken].value):
+      notVal = True
+      vari = node.name
+    else:
+      if tokenList[rowToken][columnToken].kind == "T_ID":
+        printstmt.outerStmt[rowToken][columnToken] = "No such variable is detected"
+      if findVariable(tokenList, node.parent):
+        notVal = True 
+      else:
+        notVal = False
+  return notVal
+
+def getVariable(tokenList, node, columnToken):
+  global rowToken
+  if node.paren is None:
+    val = None
+  else:
+    if any(len(counts) > 0 for counts in node.dicto.get(tokenList[rowToken][columnToken].value)):
+      val = node.dicto.get(tokenList[rowToken][columnToken].value)
+    else:
+      if findVariable(tokenList,node.parent) is True:
+        val = getVariable(tokenList, node.parent)
+      else:
+        val = None
+
+#-------------------------------------------------Checking--------------------------------------------------------------------------------
+
+def checkID(tokenList):
+  global rowToken, columnToken
+  vals = getVariable(tokenList, scopeTree.cur, columnToken-2)
+  vals2 = getVariable(tokenList, scopeTree.cur, columnToken)
+  if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
+    if vals.kind != vals2.kind:
+      printstmt.outerStmt[rowToken].append("Type mismatch: ID does not match with type ")
+  else:
+    if tokenList[rowToken][columnToken-1].kind == "T_OP":
+      if vals2.value != "int":
+        printstmt.outerStmt[rowToken].append("Type mismatch: cannot add ID")
+      else:
+        if tokenList[rowToken][columnToken-1].kind == "T_BOOLOP":
+          if vals is not None:
+            if vals.kind != vals2.kind:
+              printstmt.outerStmt[rowToken].append("Type mismatch: ID type")
+          else:
+            if tokenList[rowToken][columnToken-2].kind == "T_QUOTE" and vals2.value != "string":
+              printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare a string to non-string ID")
+            else:
+              if tokenList[rowToken][columnToken-2].kind == "T_DIGIT" and vals2.value != "int":
+                printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare integer to non-integer ID")
+              elif tokenList[rowToken][columnToken-2].kind == "T_RPAREN" or tokenList[rowToken][columnToken-2].kind == "T_BOOLVAL" and vals2.value != "boolean":
+                printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare boolean to non-boolean ID")
+
+def checkBool(tokenList):
+  global rowToken, columnToken
+  val = getVariable(tokenList, scopeTree, columnToken-2)
+  if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
+    if val.value != "boolean":
+      printstmt.outerStmt[rowToken].append("Type mismatch: on ID and boolean ")
+  else:
+    if tokenList[rowToken][columnToken-1].kind == "T_OP":
+      printstmt.outerStmt[rowToken].append("Type mismatch: cannot add boolean to int")
+    else:
+      if tokenList[rowToken][columnToken-1].kind == "T_BOOLOP":
+        if val is not None:
+          if val.value == "string":
+            printstmt.outerStmt[rowToken].append("Type mismatch: cannot add boolean to string")
+          elif val.value == "int":
+            printstmt.outerStmt[rowToken].append("Type mismatch: cannot add boolean to int")
+        else:
+          if tokenList[rowToken][columnToken-2].kind == "T_QUOTE":
+            printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare a string to boolean")
+          else:
+            if tokenList[rowToken][columnToken-2].kind == "T_DIGIT":
+              printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare integer to boolean")
+            
+def checkString(tokenList):
+  val = getVariable(tokenList, scopeTree, columnToken-2)
+  if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
+    if val.value != "string":
+      printstmt.outerStmt[rowToken].append("Type mismatch: on ID and string ")
+
+  else:
+    if tokenList[rowToken][columnToken-1].kind == "T_OP":
+      printstmt.outerStmt[rowToken].append("Type mismatch: cannot add integer to string")
+    else:
+      if tokenList[rowToken][columnToken-1].kind == "T_BOOLOP":
+        if val is not None:
+          if val.value == "int":            
+            printstmt.outerStmt[rowToken].append("Type mismatch: cannot add compare integer to string")
+          elif val.value == "boolean":
+            printstmt.outerStmt[rowToken].append("Type mismatch: cannot add compare boolean to string")
+        else:
+          if tokenList[rowToken][columnToken-2].kind == "T_DIGIT":
+            printstmt.outerStmt[rowToken].append("Type mismatch: cannot add compare integer to string")
+          elif tokenList[rowToken][columnToken-2].kind == "T_RPAREN" or tokenList[rowToken][columnToken-2].kind == "T_BOOLVAL":
+            printstmt.outerStmt[rowToken].append("Type mismatch: cannot add compare boolean to string")
+    
+def checkInteger(tokenList):
+  val = getVariable(tokenList, scopeTree, columnToken-2)
+  if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
+    if val.value != "int":
+      printstmt.outerStmt[rowToken].append("Type mismatch: on ID and integer ")
+  else:
+    # if tokenList[rowToken][columnToken-1].kind == "T_OP":
+    # else:
+    if tokenList[rowToken][columnToken-1].kind == "T_BOOLOP":
+      if val is not None:
+        if val.value == "string":            
+          printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare string to integer")
+        elif val.value == "boolean":
+          printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare boolean to integer")
+      else:
+        if tokenList[rowToken][columnToken-2].kind == "T_QUOTE":
+          printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare string to integer")
+        elif tokenList[rowToken][columnToken-2].kind == "T_RPAREN" or tokenList[rowToken][columnToken-2].kind == "T_BOOLVAL":
+          printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare boolean to integer")
+
+# --------------------------------------------------------PARSING-------------------------------------------------------------------------
+
 def parseCharList(tokenList):
   global rowToken, columnToken
   if match(tokenList, "T_CHAR") is True:
-    # ast.addNodeDef("CHARLIST", "branch")
     ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
-    # parseChar(tokenList)
     parseCharList(tokenList)
-  # elif tokenList[rowToken][columnToken].value == " ":
-  #   parseCharList(tokenList)
-  #   consumeToken
     ast.endChildren()
 
 def parseID(tokenList):
   global rowToken, columnToken
+  if findVariable(tokenList, scopeTree.cur) is True:
+    val = getVariable(tokenList, scopeTree.cur, columnToken)
+    if ast.cur.name == "Assignment" and val is not None:
+      val.initialized = True
+    else:
+      if ast.cur.name != "VarDecl" and val is not None:
+        val.used = True
+  else:
+    printstmt.outerStmt[rowToken].append("ERROR - '" + tokenList[rowToken][columnToken].value + "' undeclared" )
   ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
-  # ast.endChildren()
   consumeToken(tokenList)
   if tokenList[rowToken][columnToken].value == "=":
     parseAssignment(tokenList)
@@ -84,7 +201,7 @@ def parseBooleanExpr(tokenList):
     if tokenList[rowToken][columnToken+2].value == "==":
       ast.addNodeDef("EQUAL", "branch")
     if tokenList[rowToken][columnToken+2].value == "!=":
-      ast.addNodeDef("!EQUAL", "branch")
+      ast.addNodeDef("NotEQUAL", "branch")
     consumeToken(tokenList)
     parseExpr(tokenList)
     consumeToken(tokenList)
@@ -105,11 +222,9 @@ def parseStringExpr(tokenList):
     parseCharList(tokenList) 
     if match(tokenList, "T_QUOTE") is True:
       consumeToken(tokenList)
-  # ast.endChildren()
 
 def parseIntExpr(tokenList):
   global rowToken, columnToken
-  # ast.addNodeDef("IntExpr", "branch")
   if tokenList[rowToken][columnToken+1].kind == "T_OP":
     ast.addNodeDef("ADD", "branch")
   if match(tokenList, "T_DIGIT") is True:
@@ -162,9 +277,9 @@ def parseStatementList(tokenList):
   #   parseStatementList(tokenList)
 
 def parseBlock(tokenList):
-  global scope, scopeLevel
+  global scope
   scope+=1
-  scopeLevel+=1
+  scopeTree.addNodeDef("Scope " + str(scope), "branch")
   ast.addNodeDef("Block", "branch")
   if match(tokenList, "T_LBRACE") is True:
     consumeToken(tokenList)
@@ -172,6 +287,7 @@ def parseBlock(tokenList):
   if match(tokenList, "T_RBRACE") is True:
     consumeToken(tokenList)
   ast.endChildren()
+  scopeTree.endChildren()
 
 def parseIf(tokenList):
   global rowToken
@@ -190,10 +306,18 @@ def parseWhile(tokenList):
     parseBooleanExpr(tokenList)
     parseBlock(tokenList)
   ast.endChildren()
-
+ 
 def parseVarDecl(tokenList):
   global rowToken, columnToken
   ast.addNodeDef("VarDecl", "branch")
+  # print(type(scopeTree.cur.dicto))
+  if scopeTree.cur.dicto.get(tokenList[rowToken][columnToken+1].value) is not None:
+    printstmt.outerStmt[rowToken].append("Redeclaration is not allowed")
+  else:
+    getType = tokenList[rowToken][columnToken].value
+    getLineNum = tokenList[rowToken][columnToken+1].lineNum
+    varInfo = {'type': getType, 'lineNum':getLineNum, 'used': False, 'initialized': False, 'declared': True}
+    scopeTree.cur.dicto = {tokenList[rowToken][columnToken+1].value: varInfo}
   if match(tokenList, "T_TYPE") is True:
     ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
@@ -225,7 +349,7 @@ def parsePrint(tokenList):
   ast.endChildren()
 
 def parseProgram(tokenList):
-  global rowToken, columnToken, ast
+  global rowToken, columnToken, ast, scopeTree
   ast.addNodeDef("Program", "branch")
   if rowToken < len(tokenList):
     if match(tokenList, "T_LBRACE") is True:
@@ -234,9 +358,8 @@ def parseProgram(tokenList):
       consumeToken(tokenList)
       printstmt.outerStmt[rowToken].append("\nAST")
       printstmt.outerStmt[rowToken].append(ast.toString())
-      printstmt.outerStmt[rowToken].append("--------------------------------------")
-      printstmt.outerStmt[rowToken].append("Name      Type        Scope       Line")
-      printstmt.outerStmt[rowToken].append("--------------------------------------")
+      printstmt.outerStmt[rowToken].append("\nSymbol Table")
+      printstmt.outerStmt[rowToken].append(scopeTree.toString())
       # Once it reaches EOP, move to the next row of the 2D array
       rowToken+=1
       # Set columnToken to zero to start from the beginning of the row
@@ -246,6 +369,7 @@ def parseProgram(tokenList):
       scopeLevel = 0
       scope = 0
       ast = astTree.Tree()
+      scopeTree = symbolTree.Tree()
       # To avoid out of range
       if rowToken < len(tokenList):
         semanticAnalysis(tokenList)
