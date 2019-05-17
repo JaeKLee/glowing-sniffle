@@ -37,6 +37,7 @@ def printValidStmt(tokenList, expectedToken):
 
 def consumeToken(tokenList):
   global rowToken, columnToken
+  cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
   if rowToken < len(tokenList):
     columnToken+=1
 
@@ -46,7 +47,7 @@ def parseBoolOp(tokenList):
   printstmt.outerStmt[rowToken].append("parseBoolOp()") 
   if match(tokenList, "T_BOOLOP") is True:
     printValidStmt(tokenList, "T_BOOLOP")
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
   else:
     printErrorStmt(tokenList, "T_BOOLOP")
@@ -56,29 +57,33 @@ def parseChar(tokenList):
   if match(tokenList, "T_CHAR") is True:
     printstmt.outerStmt[rowToken].append("parseChar()")
     printValidStmt(tokenList, "T_CHAR")
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
   elif tokenList[rowToken][columnToken].value == " ":
     printstmt.outerStmt[rowToken].append("parseChar()")
     printValidStmt(tokenList, "T_SPACE")
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
+  
 
 def parseCharList(tokenList):
   global rowToken
-  cst.addNodeDef("CharList", "branch")
-  printstmt.outerStmt[rowToken].append("parseCharList()")
   if match(tokenList, "T_CHAR") is True:
-    parseChar(tokenList)
+    cst.addNodeDef("CharList", "branch")
+    printstmt.outerStmt[rowToken].append("parseCharList()")
+    printValidStmt(tokenList, "T_CHAR")
+    # parseChar(tokenList)
+    consumeToken(tokenList)
     parseCharList(tokenList)
-  elif tokenList[rowToken][columnToken].value == " ":
-    parseCharList(tokenList)
-  cst.endChildren()
+    cst.endChildren()
+  # elif tokenList[rowToken][columnToken].value == " ":
+  #   parseCharList(tokenList)
+  # cst.endChildren()
 
 def parseID(tokenList):
   printValidStmt(tokenList, "T_ID parseID")
   consumeToken(tokenList)
-  cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+  # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
   cst.endChildren()
   if tokenList[rowToken][columnToken].value == "=":
     parseAssignment(tokenList)
@@ -90,11 +95,11 @@ def parseExpr(tokenList):
   if match(tokenList, "T_DIGIT") is True:
     parseIntExpr(tokenList)
   elif match(tokenList, "T_QUOTE") is True:
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     parseStringExpr(tokenList) 
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
   elif match(tokenList, "T_RPAREN") is True:
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     parseBooleanExpr(tokenList)
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
   elif match(tokenList, "T_ID") is True:
     parseID(tokenList)
   else:
@@ -107,14 +112,14 @@ def parseBooleanExpr(tokenList):
   printstmt.outerStmt[rowToken].append("parseBooleanExpr()")
   if match(tokenList, "T_LPAREN") is True:
     printValidStmt(tokenList, "T_LPAREN")
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
     parseExpr(tokenList)
     parseBoolOp(tokenList)
     parseExpr(tokenList)
     if match(tokenList, "T_RPAREN") is True:
       printValidStmt(tokenList, "T_RPAREN")
-      cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+      # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
       consumeToken(tokenList)
     else:
       printErrorStmt(tokenList, "T_RPAREN")
@@ -132,7 +137,7 @@ def parseStringExpr(tokenList):
     parseCharList(tokenList) 
     if match(tokenList, "T_QUOTE") is True:
       printValidStmt(tokenList, "T_QUOTE")
-      cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+      # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
       consumeToken(tokenList)
   else: 
     printstmt.outerStmt[rowToken].append("parse string wrong")
@@ -144,11 +149,11 @@ def parseIntExpr(tokenList):
   printstmt.outerStmt[rowToken].append("parseIntExpr()")
   if match(tokenList, "T_DIGIT") is True:
     printValidStmt(tokenList, "T_DIGIT")
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
     if match(tokenList, "T_OP") is True:
       printValidStmt(tokenList, "T_OP")
-      cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+      # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
       consumeToken(tokenList)
       parseExpr(tokenList)
   else:
@@ -157,6 +162,7 @@ def parseIntExpr(tokenList):
 
 def parseStatement(tokenList):
   cst.addNodeDef("Statement", "branch")
+  cst.endChildren()
   global rowToken, columnToken
   notVal = False
   # If print("parseStatement()") is not in individual
@@ -201,6 +207,7 @@ def parseStatementList(tokenList):
     printstmt.outerStmt[rowToken].append("parseStatementList()")
     parseStatement(tokenList)
     parseStatementList(tokenList)
+  cst.endChildren()
   # else:
   #   printstmt.outerStmt[rowToken].append("Lambda")
 
@@ -208,7 +215,7 @@ def parseBlock(tokenList):
   global rowToken, columnToken
   cst.addNodeDef("Block", "branch")
   if match(tokenList, "T_LBRACE") is True:
-    cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+    # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     printstmt.outerStmt[rowToken].append("parseBlock()")
     printValidStmt(tokenList, "T_LBRACE")
     consumeToken(tokenList)
@@ -216,6 +223,11 @@ def parseBlock(tokenList):
     printErrorStmt(tokenList, "T_LBRACE")
   parseStatementList(tokenList)
  
+  if match(tokenList, "T_RBRACE") is True:
+    printValidStmt(tokenList, "T_RBRACE")
+    consumeToken(tokenList)
+  else:
+    printErrorStmt(tokenList, "T_RBRACE")
     # raise Exception('Whatever the error is'.format(tokenList[rowToken][columnToken].value))
     # if rowToken < len(tokenList):
     # parse(tokenList)
@@ -283,14 +295,14 @@ def parsePrint(tokenList):
     printValidStmt(tokenList, "T_PRINT")
     consumeToken(tokenList)
     if match(tokenList, "T_LPAREN") is True:
-      cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+      # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
       printValidStmt(tokenList, "T_LPAREN")
       consumeToken(tokenList)
       parseExpr(tokenList)
     else:
       printErrorStmt(tokenList, "T_LPARENT")
     if match(tokenList, "T_RPAREN") is True:
-      cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+      # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
       printValidStmt(tokenList, "T_RPAREN")
       consumeToken(tokenList)
     else:
@@ -300,7 +312,7 @@ def parsePrint(tokenList):
   cst.endChildren()
 test = []
 def parseProgram(tokenList):
-  global rowToken, columnToken, errorCounter
+  global rowToken, columnToken, errorCounter, cst
   printstmt.outerStmt[rowToken].append("parseProgram()")
   cst.addNodeDef("Program", "branch")
   if rowToken < len(tokenList):
@@ -308,32 +320,26 @@ def parseProgram(tokenList):
       parseBlock(tokenList)
     else:
       printErrorStmt(tokenList, "T_LBRACE")  
-    if match(tokenList, "T_RBRACE") is True:
-      cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
-      printValidStmt(tokenList, "T_RBRACE")
-      consumeToken(tokenList)
-    else:
-      printErrorStmt(tokenList, "T_RBRACE")
-      # consumeToken(tokenList)
     if errorCounter < 1:
-      test.append(errorCounter)
-      print(errorCounter)
+      # test.append(errorCounter)
+      # print(errorCounter)
       if match(tokenList, "T_EOP") is True:
-        cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
+        # cst.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
         printValidStmt(tokenList, "T_EOP")
         consumeToken(tokenList)
         printstmt.outerStmt[rowToken].append("\nCST")
         printstmt.outerStmt[rowToken].append(cst.toString())
+        cst = tree.Tree()
         rowToken+=1
         columnToken=0
         if rowToken < len(tokenList):
           parse(tokenList)
     elif errorCounter > 0:
-      test.append(errorCounter)
-      print(errorCounter)
+      # test.append(errorCounter)
+      # print(errorCounter)
       # parse(tokenList)
       # if errorCounter > 0:
-      cst.toString()
+      # cst.toString()
       tokenList[rowToken] = []
       tokenList[rowToken].append("ERROR")
       # print(tokenList[rowToken])
@@ -348,11 +354,11 @@ def parseProgram(tokenList):
         # columnToken=0
         errorCounter=0
         parse(tokenList)
-    cst.endChildren()
+    # cst.endChildren()
     return tokenList
 
 def parse(tokenList):
-  global rowToken, columnToken, errorCounter
+  global rowToken, columnToken, errorCounter, cst
   # print(str(rowToken) + " " + str(columnToken))
   printstmt.outerStmt[rowToken].append("\nPARSER")
   if match(tokenList, "ERROR") is True:
@@ -361,11 +367,13 @@ def parse(tokenList):
       rowToken+=1 # Moving onto next program
       columnToken=0
       errorCounter = 0
+      cst = tree.Tree()
       parse(tokenList)
   if errorCounter > 0:
     rowToken+=1 # Moving onto next program
     columnToken=0
     errorCounter = 0
+    cst = tree.Tree()
     parse(tokenList)
   else:
     cst.addNodeDef("Root", "branch")

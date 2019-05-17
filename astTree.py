@@ -5,7 +5,7 @@ class Node:
     self.children = []
     self.parent = None
 
-# traversalResult = ""    
+traversalResult = ""    
 
 class Tree: 
   def __init__(self):
@@ -34,24 +34,18 @@ class Tree:
     # if self.cur.parent is not None and self.cur.parent.name is not None:
     # print(self.cur.parent.name)
     # print(self.cur.parent)
-    
-    # if self.cur.parent is not None:
-    #   try: 
-    #     self.cur.parent.name
-    #     self.cur = self.cur.parent
-    #   except NameError:
-    #     print("This should not happen")
     if self.cur.parent is not None and self.cur.parent.name is not None:
       self.cur = self.cur.parent
     # else:
     #   print("error in tree")
 
+  # print(traversalResult + "printing traversal")
   def toString(self):
-    # global traversalResult
+    global traversalResult
     traversalResult = ""
     def expand(node, depth):
-      nonlocal traversalResult
-      # traversalResult = ""
+      global traversalResult
+      # traversalResult = "in expand"
       i = 0
       while i < depth:
         traversalResult+="-"
@@ -67,12 +61,18 @@ class Tree:
         for children in node.children:
           # expand(node.children[j], depth + 1)
           expand(children, depth + 1)
-          # print(j.name)
+          # node.children=[]
+          # print(children.name)
         # j+=1
         # return traversalResult
-      # node.children=[]
-    
+      # node.name = ""
+      node.children = []
+      # node.parent = None  
+      # node.children = None
     expand(self.root, 0)
     return traversalResult
+    # traversalResult=""
     # return expand(self.root, 0)
-  # print(traversalResult)
+  # print(traversalResult + "printing traversal")
+
+# traversalResult = ""

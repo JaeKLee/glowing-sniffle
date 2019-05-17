@@ -21,6 +21,7 @@ def letsDrive():
   # It should be 2D list
   tokenList = lex.lex(listFile)
 
+  # parzerList = parzer.parse(tokenList)
   parzer.parse(tokenList)
   semanticAnalysis.semanticAnalysis(tokenList)
 
