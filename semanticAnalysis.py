@@ -378,8 +378,8 @@ def semanticAnalysis(tokenList):
     columnToken=0
     scope = 0
     ast = astTree.Tree()
-    # symbolTable.cur.dicto.clear()
-    symbolTable = None
-    symbolTable = symbolTree.Tree()
+    symbolTable.cur.dicto.clear()
+    # symbolTable = None
+    # symbolTable = symbolTree.Tree()
     semanticAnalysis(tokenList)
   return codeGen

@@ -16,6 +16,7 @@ def letsDrive():
   import parzer
   import printstmt
   import semanticAnalysis
+  import codegen
 
   # Create list of tokens from the LEX output
   # It should be 2D list
@@ -23,7 +24,9 @@ def letsDrive():
 
   # parzerList = parzer.parse(tokenList)
   parzer.parse(tokenList)
-  semanticAnalysis.semanticAnalysis(tokenList)
+  saCodegen = semanticAnalysis.semanticAnalysis(tokenList)
+  codegen.startCodeGen(saCodegen)
+  # print(saCodegen.get('program1').get('AST').toString())
 
 
   # Checking for debugging
