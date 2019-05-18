@@ -11,6 +11,7 @@ errorCounter = 0
 scope = -1
 ast = astTree.Tree()
 symbolTable = symbolTree.Tree()
+codeGen = {}
 
 def match(tokenList, expectedToken):
   global rowToken, columnToken
@@ -273,7 +274,7 @@ def parseBlock(tokenList):
 
 def parseIf(tokenList):
   global rowToken
-  ast.addNodeDef("IF", "branch")
+  ast.addNodeDef("If", "branch")
   if match(tokenList, "T_IF") is True:
     consumeToken(tokenList)
     parseBooleanExpr(tokenList)
@@ -282,7 +283,7 @@ def parseIf(tokenList):
 
 def parseWhile(tokenList):
   global rowToken
-  ast.addNodeDef("WHILE", "branch")
+  ast.addNodeDef("While", "branch")
   if match(tokenList, "T_WHILE") is True:
     consumeToken(tokenList)
     parseBooleanExpr(tokenList)
@@ -296,7 +297,7 @@ def parseVarDecl(tokenList):
     getType = tokenList[rowToken][columnToken].value
     getLineNum = tokenList[rowToken][columnToken+1].lineNum
     varInfo = {'type': getType, 'lineNum':getLineNum, 'used': False, 'initialized': False, 'declared': True}
-    symbolTable.cur.dicto.setdefault(tokenList[rowToken][columnToken+1].value,varInfo)
+    symbolTable.cur.dicto.update({tokenList[rowToken][columnToken+1].value:varInfo})
   else:
     raise Exception("Redeclaration of '" + tokenList[rowToken][columnToken].value + "' is not allowed. Please revise at line number " + str(tokenList[rowToken][columnToken].lineNum))
   if match(tokenList, "T_TYPE") is True:
@@ -319,7 +320,7 @@ def parseAssignment(tokenList):
   ast.endChildren()
 
 def parsePrint(tokenList):
-  ast.addNodeDef("PRINT", "branch")
+  ast.addNodeDef("Print", "branch")
   if match(tokenList, "T_PRINT") is True:
     consumeToken(tokenList)
     if match(tokenList, "T_LPAREN") is True:
@@ -332,7 +333,7 @@ def parsePrint(tokenList):
   ast.endChildren()
 
 def parseProgram(tokenList):
-  global rowToken, columnToken, ast, symbolTable
+  global rowToken, columnToken, ast, symbolTable, codeGen
   ast.addNodeDef("Program", "branch")
   if rowToken < len(tokenList):
     if match(tokenList, "T_LBRACE") is True:
@@ -344,6 +345,10 @@ def parseProgram(tokenList):
       printstmt.outerStmt[rowToken].append("\nSymbol Table")      
       printstmt.outerStmt[rowToken].append("\nName    Type       Scope       Line")
       printstmt.outerStmt[rowToken].append(symbolTable.toString())
+
+      programNumber = 'program'+str(rowToken+1)
+      # codeGen = {} 
+      codeGen.setdefault(programNumber,{'AST':ast, 'symbolTable': symbolTable})
       # Once it reaches EOP, move to the next row of the 2D array
       rowToken+=1
       # Set columnToken to zero to start from the beginning of the row
@@ -359,7 +364,7 @@ def parseProgram(tokenList):
           raise Exception("Error in Program at " + str(tokenList[rowToken][columnToken].lineNum))
 
 def semanticAnalysis(tokenList):
-  global rowToken,columnToken, ast
+  global rowToken,columnToken, ast, codeGen
   if rowToken < len(tokenList):
     printstmt.outerStmt[rowToken].append("\nSemantic Analysis")
   try:
@@ -373,5 +378,8 @@ def semanticAnalysis(tokenList):
     columnToken=0
     scope = 0
     ast = astTree.Tree()
-    symbolTable.cur.dicto.clear()
+    # symbolTable.cur.dicto.clear()
+    symbolTable = None
+    symbolTable = symbolTree.Tree()
     semanticAnalysis(tokenList)
+  return codeGen
