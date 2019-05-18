@@ -24,8 +24,9 @@ def letsDrive():
 
   # parzerList = parzer.parse(tokenList)
   parzer.parse(tokenList)
-  saCodegen = semanticAnalysis.semanticAnalysis(tokenList)
-  codegen.startCodeGen(saCodegen)
+  semanticAnalysis.semanticAnalysis(tokenList)
+  # saCodegen = semanticAnalysis.semanticAnalysis(tokenList)
+  # codegen.startCodeGen(saCodegen)
   # print(saCodegen.get('program1').get('AST').toString())
 
 
