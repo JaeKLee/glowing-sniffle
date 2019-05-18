@@ -4,7 +4,7 @@ class Node:
     self.name = inputName # scope
     self.children = []
     self.parent = None
-    self.dicto = {}# dict() # New empty dictionary
+    self.dicto = {} # dict() # New empty dictionary
 
 class Tree: 
   def __init__(self):
@@ -40,24 +40,18 @@ class Tree:
     warning = ""
     def expand(node, depth):
       nonlocal traversalResult, warning
-      i = 0
-      while i < depth:
-        traversalResult+="-"
-        i+=1
-      if node.children is None or len(node.children) == 0:
-        traversalResult += "[" + node.name + "]\n"
+      if node.children is None or len(node.children) == 0: # last one
+        for key in node.dicto:
+          # traversalResult += "[" + node.name + "]\n" + str(node.dicto) + "\n"
+          if node.dicto.get(key) is not None:
+            traversalResult += key + "       " + node.dicto.get(key).get('type') + "       " + str(node.name) + "       " + str(node.dicto.get(key).get('lineNum')) + "\n"
+        traversalResult += "\n"
+      else: #first to last-1
         for key in node.dicto:
           if node.dicto.get(key) is not None:
-            # print(node.dicto.get(key))
-            traversalResult += key + " | " + node.dicto.get(key).get('type') + " | " + str(node.name) + " | " + str(node.dicto.get(key).get('lineNum')) + "\n"
-          if node.dicto.get(key).get('initialized') is False:
-            warning += "WARNING - " + key + " was declared but not initialized\n"
-          if node.dicto.get(key).get('declared') is False:
-            warning += "WARNING - " + key + " was declared but not used\n"
-        traversalResult += "\n"
-      else:
-        traversalResult += "<" + node.name + "> \n"
+            traversalResult += key + "       " + node.dicto.get(key).get('type') + "       " + str(node.name) + "       " + str(node.dicto.get(key).get('lineNum')) + "\n"
         for children in node.children:
           expand(children, depth + 1)
+      
     expand(self.root, 0)
     return traversalResult

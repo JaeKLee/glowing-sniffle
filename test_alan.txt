@@ -1,6 +1,3 @@
-{}$
-
-{{{{{{}}}}}}$
-{ /* comments are still ignored */ int @}$
-{{{{{{}}} /* comments are ignored */ }}}}$
- 
+{
+  string 1
+}

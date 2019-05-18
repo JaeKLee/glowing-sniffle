@@ -234,7 +234,7 @@ def lex(listFile):
             printstmt.innerStmt.append("Found token ASSIGN : " + str(listFile[indexCounter]) +   " in line " + str(lineNumber))
             # print("Found token assignment : " , listFile[indexCounter] , " in line " , lineNumber)
             indexCounter+=1
-        elif re.findall(regex.digit, listFile[indexCounter]): # DIGIT
+        elif re.search(regex.digit, listFile[indexCounter]): # DIGIT
           createToken("T_DIGIT", listFile[indexCounter], lineNumber)
           printstmt.innerStmt.append("Found token DIGIT : " + str(listFile[indexCounter]) +   " in line " + str(lineNumber))
           # print("Found token DIGIT : " , listFile[indexCounter] , " in line " , lineNumber)
@@ -317,7 +317,5 @@ def lex(listFile):
       warningCounter+=1
   if warningCounter > 0:
     printstmt.innerStmt.append("Found " , warningCounter , " warning(s) in LEXER")
-
-  
   return programList
 # lex(listFile)

@@ -2,7 +2,6 @@ import printstmt
 import astTree
 import re
 import symbolTree
-
 # This will traverse through each row of the 2D
 rowToken = 0
 # This will traverse through each value in the row
@@ -11,54 +10,54 @@ warningCounter = 0
 errorCounter = 0
 scope = -1
 ast = astTree.Tree()
-scopeTree = symbolTree.Tree()
+symbolTable = symbolTree.Tree()
 
 def match(tokenList, expectedToken):
   global rowToken, columnToken
   notVal = False
   if rowToken < len(tokenList):
     if expectedToken == tokenList[rowToken][columnToken].kind:
-      notVal = True  
+      notVal = True
   return notVal
 
 def consumeToken(tokenList):
   global rowToken, columnToken
-  # ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
   if rowToken < len(tokenList):
     columnToken+=1
 
 def findVariable(tokenList, node):
   global rowToken, columnToken
   notVal = False
-  # if tokenList[rowToken][columnToken].kind == "T_ID":
-  #   printstmt[rowToken][columnToken]
-  if node.parent is None:
-    if match(tokenList, "T_ID") is True:
-      printstmt.outerStmt[rowToken].append("No such variable is detected")
-      notVal = False
-  else:
-    if node.dicto.get(tokenList[rowToken][columnToken].value):
-      notVal = True
-      vari = node.name
+  if match(tokenList, "T_ID") is True:
+    if node.parent is None:
+      if node.dicto.get(tokenList[rowToken][columnToken].value) is not None:
+        printstmt.outerStmt[rowToken].append("Found " + tokenList[rowToken][columnToken].value + " at " + node.name + " in line " + str(tokenList[rowToken][columnToken].lineNum))
+        notVal = True
     else:
-      if tokenList[rowToken][columnToken].kind == "T_ID":
-        printstmt.outerStmt[rowToken][columnToken] = "No such variable is detected"
-      if findVariable(tokenList, node.parent):
-        notVal = True 
+      if node.dicto.get(tokenList[rowToken][columnToken].value) is not None:
+        printstmt.outerStmt[rowToken].append("Found " + tokenList[rowToken][columnToken].value + " at " + node.name + " in line " + str(tokenList[rowToken][columnToken].lineNum))
+        notVal = True
       else:
-        notVal = False
+        if match(tokenList, "T_ID") is True: #tokenList[rowToken][columnToken].kind == "T_ID":
+          printstmt.outerStmt[rowToken].append("Variable '" + tokenList[rowToken][columnToken].value + "' is not detected at " + node.name)
+        if findVariable(tokenList, node.parent) is True:
+          notVal = True
+        else:
+          notVal = False
+  else:
+    raise Exception("Token '" + tokenList[rowToken][columnToken].value + "' is not a variable")
   return notVal
 
 def getVariable(tokenList, node, columnToken):
   global rowToken
-  if node.paren is None:
+  if node.parent is None:
     val = None
   else:
-    if any(len(counts) > 0 for counts in node.dicto.get(tokenList[rowToken][columnToken].value)):
+    if node.dicto.get(tokenList[rowToken][columnToken].value) is not None:
       val = node.dicto.get(tokenList[rowToken][columnToken].value)
     else:
       if findVariable(tokenList,node.parent) is True:
-        val = getVariable(tokenList, node.parent)
+        val = getVariable(tokenList, node.parent, columnToken)
       else:
         val = None
 
@@ -66,8 +65,8 @@ def getVariable(tokenList, node, columnToken):
 
 def checkID(tokenList):
   global rowToken, columnToken
-  vals = getVariable(tokenList, scopeTree.cur, columnToken-2)
-  vals2 = getVariable(tokenList, scopeTree.cur, columnToken)
+  vals = getVariable(tokenList, symbolTable.cur, columnToken-2)
+  vals2 = getVariable(tokenList, symbolTable.cur, columnToken)
   if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
     if vals.kind != vals2.kind:
       printstmt.outerStmt[rowToken].append("Type mismatch: ID does not match with type ")
@@ -91,7 +90,7 @@ def checkID(tokenList):
 
 def checkBool(tokenList):
   global rowToken, columnToken
-  val = getVariable(tokenList, scopeTree, columnToken-2)
+  val = getVariable(tokenList, symbolTable, columnToken-2)
   if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
     if val.value != "boolean":
       printstmt.outerStmt[rowToken].append("Type mismatch: on ID and boolean ")
@@ -113,7 +112,7 @@ def checkBool(tokenList):
               printstmt.outerStmt[rowToken].append("Type mismatch: cannot compare integer to boolean")
             
 def checkString(tokenList):
-  val = getVariable(tokenList, scopeTree, columnToken-2)
+  val = getVariable(tokenList, symbolTable, columnToken-2)
   if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
     if val.value != "string":
       printstmt.outerStmt[rowToken].append("Type mismatch: on ID and string ")
@@ -135,13 +134,11 @@ def checkString(tokenList):
             printstmt.outerStmt[rowToken].append("Type mismatch: cannot add compare boolean to string")
     
 def checkInteger(tokenList):
-  val = getVariable(tokenList, scopeTree, columnToken-2)
+  val = getVariable(tokenList, symbolTable.cur, columnToken-2)
   if tokenList[rowToken][columnToken-1].kind == "T_ASSIGN":
     if val.value != "int":
       printstmt.outerStmt[rowToken].append("Type mismatch: on ID and integer ")
   else:
-    # if tokenList[rowToken][columnToken-1].kind == "T_OP":
-    # else:
     if tokenList[rowToken][columnToken-1].kind == "T_BOOLOP":
       if val is not None:
         if val.value == "string":            
@@ -166,20 +163,19 @@ def parseCharList(tokenList):
 
 def parseID(tokenList):
   global rowToken, columnToken
-  if findVariable(tokenList, scopeTree.cur) is True:
-    val = getVariable(tokenList, scopeTree.cur, columnToken)
+  if findVariable(tokenList, symbolTable.cur) is True:
+    val = getVariable(tokenList, symbolTable.cur, columnToken)
     if ast.cur.name == "Assignment" and val is not None:
       val.initialized = True
     else:
       if ast.cur.name != "VarDecl" and val is not None:
         val.used = True
   else:
-    printstmt.outerStmt[rowToken].append("ERROR - '" + tokenList[rowToken][columnToken].value + "' undeclared" )
+    raise Exception("Undeclared '" + tokenList[rowToken][columnToken].value + "' at " + str(tokenList[rowToken][columnToken].lineNum))
   ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
   consumeToken(tokenList)
   if tokenList[rowToken][columnToken].value == "=":
     parseAssignment(tokenList)
-
 def parseExpr(tokenList):
   global rowToken
   if match(tokenList, "T_DIGIT") is True:
@@ -191,8 +187,7 @@ def parseExpr(tokenList):
   elif match(tokenList, "T_ID") is True:
     parseID(tokenList)
   else:
-    consumeToken(tokenList)
-  # ast.endChildren()
+    raise Exception("Error in Expression at " + str(tokenList[rowToken][columnToken].lineNum))
 
 def parseBooleanExpr(tokenList):
   global rowToken, columnToken
@@ -213,7 +208,7 @@ def parseBooleanExpr(tokenList):
     ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
   else:
-    errorCounter+=1
+    raise Exception("Error in Boolean Expression at " + str(tokenList[rowToken][columnToken].lineNum))
   
 def parseStringExpr(tokenList):
   global rowToken
@@ -230,36 +225,31 @@ def parseIntExpr(tokenList):
   if match(tokenList, "T_DIGIT") is True:
     ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
+  else:
+    raise Exception("Error in Integer Expression at " + str(tokenList[rowToken][columnToken].lineNum))
   if match(tokenList, "T_OP") is True:
-      # ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
     parseExpr(tokenList)
     ast.endChildren()
 
 def parseStatement(tokenList):
-  notVal = False
+  global errorCounter
   # If print("parseStatement()") is not in individual
   # statements, it will print out countless parseStatement()
   if match(tokenList, "T_PRINT") is True:
-    notVal = True
     parsePrint(tokenList)
   elif match(tokenList, "T_ID") is True:
-    notVal = True
     parseAssignment(tokenList)
   elif match(tokenList, "T_TYPE") is True:
-    notVal = True
     parseVarDecl(tokenList)
   elif match(tokenList, "T_WHILE") is True:
-    notVal = True
     parseWhile(tokenList)
   elif match(tokenList, "T_IF") is True:
-    notVal = True
     parseIf(tokenList)
   elif match(tokenList, "T_LBRACE") is True:
-    notVal = True
     parseBlock(tokenList)
-  else: # It will do nothing because statementList allows epsilon
-    notVal = False
+  else:
+    raise Exception("Error in Statement at " + str(tokenList[rowToken][columnToken].lineNum))
   # ast.endChildren()
   # return notVal
   
@@ -268,26 +258,18 @@ def parseStatementList(tokenList):
     parseStatement(tokenList)
     parseStatementList(tokenList)
     ast.endChildren()
-  # if match(tokenList, "T_PRINT") is True or match(tokenList, "T_ID") is True or match(tokenList, "T_TYPE") is True or match(tokenList, "T_WHILE") is True or match(tokenList, "T_IF") is True or match(tokenList, "T_LBRACE") is True:
-  #   parseStatement(tokenList)
-  #   parseStatementList(tokenList)
-  # ast.endChildren()
-  # if match(tokenList, "T_PRINT") is True or match(tokenList, "T_ID") is True or match(tokenList, "T_TYPE") is True or match(tokenList, "T_WHILE") is True or match(tokenList, "T_IF") is True or match(tokenList, "T_LBRACE") is True:
-  #   parseStatement(tokenList)
-  #   parseStatementList(tokenList)
 
 def parseBlock(tokenList):
   global scope
   scope+=1
-  scopeTree.addNodeDef("Scope " + str(scope), "branch")
+  symbolTable.addNodeDef("Scope " + str(scope), "branch")
   ast.addNodeDef("Block", "branch")
-  if match(tokenList, "T_LBRACE") is True:
-    consumeToken(tokenList)
-  parseStatementList(tokenList)
-  if match(tokenList, "T_RBRACE") is True:
-    consumeToken(tokenList)
+  consumeToken(tokenList) # Skipping LBRACE
+  if match(tokenList, "T_RBRACE") is False:
+    parseStatementList(tokenList)
+  consumeToken(tokenList) # Skipping RBRACE
   ast.endChildren()
-  scopeTree.endChildren()
+  symbolTable.endChildren()
 
 def parseIf(tokenList):
   global rowToken
@@ -310,18 +292,19 @@ def parseWhile(tokenList):
 def parseVarDecl(tokenList):
   global rowToken, columnToken
   ast.addNodeDef("VarDecl", "branch")
-  # print(type(scopeTree.cur.dicto))
-  if scopeTree.cur.dicto.get(tokenList[rowToken][columnToken+1].value) is not None:
-    printstmt.outerStmt[rowToken].append("Redeclaration is not allowed")
-  else:
+  if symbolTable.cur.dicto.get(tokenList[rowToken][columnToken+1].value) is None:
     getType = tokenList[rowToken][columnToken].value
     getLineNum = tokenList[rowToken][columnToken+1].lineNum
     varInfo = {'type': getType, 'lineNum':getLineNum, 'used': False, 'initialized': False, 'declared': True}
-    scopeTree.cur.dicto = {tokenList[rowToken][columnToken+1].value: varInfo}
+    symbolTable.cur.dicto.setdefault(tokenList[rowToken][columnToken+1].value,varInfo)
+  else:
+    raise Exception("Redeclaration of '" + tokenList[rowToken][columnToken].value + "' is not allowed. Please revise at line number " + str(tokenList[rowToken][columnToken].lineNum))
   if match(tokenList, "T_TYPE") is True:
     ast.addNodeDef(tokenList[rowToken][columnToken].value, "leaf")
     consumeToken(tokenList)
     parseID(tokenList)
+  else:
+    raise Exception("Error in Variable Declaration at " + str(tokenList[rowToken][columnToken].lineNum))
   ast.endChildren()
 
 def parseAssignment(tokenList):
@@ -349,7 +332,7 @@ def parsePrint(tokenList):
   ast.endChildren()
 
 def parseProgram(tokenList):
-  global rowToken, columnToken, ast, scopeTree
+  global rowToken, columnToken, ast, symbolTable
   ast.addNodeDef("Program", "branch")
   if rowToken < len(tokenList):
     if match(tokenList, "T_LBRACE") is True:
@@ -358,54 +341,37 @@ def parseProgram(tokenList):
       consumeToken(tokenList)
       printstmt.outerStmt[rowToken].append("\nAST")
       printstmt.outerStmt[rowToken].append(ast.toString())
-      printstmt.outerStmt[rowToken].append("\nSymbol Table")
-      printstmt.outerStmt[rowToken].append(scopeTree.toString())
+      printstmt.outerStmt[rowToken].append("\nSymbol Table")      
+      printstmt.outerStmt[rowToken].append("\nName    Type       Scope       Line")
+      printstmt.outerStmt[rowToken].append(symbolTable.toString())
       # Once it reaches EOP, move to the next row of the 2D array
       rowToken+=1
       # Set columnToken to zero to start from the beginning of the row
       columnToken = 0
-      warningCounter = 0
-      errorCounter = 0
       scopeLevel = 0
       scope = 0
       ast = astTree.Tree()
-      scopeTree = symbolTree.Tree()
+      symbolTable = symbolTree.Tree()
       # To avoid out of range
       if rowToken < len(tokenList):
         semanticAnalysis(tokenList)
-  # ast.endChildren()
+    else:
+          raise Exception("Error in Program at " + str(tokenList[rowToken][columnToken].lineNum))
 
 def semanticAnalysis(tokenList):
-  import parzer
-  global rowToken,columnToken, errorCounter
-  # print("this is to test if semantic analysis is being called properly. I can't see the word test without writing this long sentence.")
-  # printstmt.outerStmt[rowToken].append("\nSemantic Analysis")
-  # if match(tokenList, "ERROR") is True:
-  # print(rowToken)
-  # printstmt.outerStmt[rowToken].append("\nSemantic Analysis")
-  # for i in parzer.test:
-  # print(tokenList[rowToken][columnToken ])
-  i = 0
-  # while i < len(tokenList):
-    # global rowToken, columnToken
-  # print(str(parzer.test[i]) +  "in semantic")
-  # if parzer.test[i] > 0:
-  # if parzer.errorCounter > 0:
-  # print(tokenList[rowToken][columnToken])
-  # if re.search(r"ERROR", tokenList[rowToken][columnToken]):
-  # if match(tokenList, "ERROR") is True:
-  if tokenList is None:
+  global rowToken,columnToken, ast
+  if rowToken < len(tokenList):
+    printstmt.outerStmt[rowToken].append("\nSemantic Analysis")
+  try:
     if rowToken < len(tokenList):
-      printstmt.outerStmt[rowToken].append("\nSemantic Analysis" + str(parzer.test[i]))
-      printstmt.outerStmt[rowToken].append("Semantic Analysis: Skipped due to Parser error(s)")
-      rowToken+=1 # Moving onto next program
-      # programNumber+=1
-      # columnToken=0
-      semanticAnalysis(tokenList)
-  else:
-    if rowToken < len(tokenList):
-      printstmt.outerStmt[rowToken].append("\nSemantic Analysis")
       ast.addNodeDef("Root", "branch")
-      printstmt.outerStmt[rowToken].append("Semantic Analysis... Commence!")
       parseProgram(tokenList)
-    # i+=1
+  except Exception as e:
+    printstmt.outerStmt[rowToken].append("Error in Semantic Analysis, not moving to Code Gen")
+    printstmt.outerStmt[rowToken].append(e)
+    rowToken+=1
+    columnToken=0
+    scope = 0
+    ast = astTree.Tree()
+    symbolTable.cur.dicto.clear()
+    semanticAnalysis(tokenList)
