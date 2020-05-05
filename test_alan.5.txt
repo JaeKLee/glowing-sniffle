@@ -1,0 +1,9 @@
+
+{ /* comments are still ignored */ int}$
+
+{    
+  int a    
+  a = a    
+  string b    
+  a = b 
+}$

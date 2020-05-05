@@ -1,0 +1,15 @@
+{{
+  int a = 2
+  int b = 4
+  string c$
+  if (a == b)
+  {
+    c = "even"
+  }$      
+  if (a != b)
+  {
+    c = "odd"$
+  }
+
+  print(c)
+}}$
